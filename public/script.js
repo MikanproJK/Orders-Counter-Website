@@ -94,6 +94,7 @@ function updatevalues() {
     })
     let gains = orders * 500
     document.getElementById("totalorders").textContent = `Total de Pedidos: ${orders}`;
+    document.getElementById("totalgains").textContent = `Total de Ganancias: ${gains}`;
 }
 
 document.addEventListener("DOMContentLoaded", () => {updatevalues();})
