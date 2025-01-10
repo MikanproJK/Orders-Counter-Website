@@ -57,6 +57,7 @@ function loadOrders() {
                 order.id = orderData.id;
                 order.date = new Date(orderData.date);
                 order.init();  // Inicializa correctamente cada orden con sus datos
+                updatevalues();
             });
         })
         .catch(error => console.error('Error al cargar las órdenes:', error));
@@ -66,8 +67,10 @@ function loadOrders() {
 document.getElementById("addorder").addEventListener("click", () => {
     const cantity = parseInt(prompt("Cantidad de Pedidos (NUMERO):"), 10);
     if (!isNaN(cantity) && cantity > 0) {
+
         const newOrder = new Order(cantity);
         ORDERS.push(newOrder);
+        updatevalues();
 
         fetch('/orders', {
             method: 'POST',
@@ -83,3 +86,15 @@ document.getElementById("addorder").addEventListener("click", () => {
         alert("Por favor, ingresa un número válido.");
     }
 });
+
+function updatevalues() {
+    let orders = 0
+    ORDERS.forEach(orderData => {
+        orders += orderData.cantity;
+    })
+    let gains = orders * 500
+    document.getElementById("totalorders").textContent = `Total de Pedidos: ${orders}`;
+}
+
+document.addEventListener("DOMContentLoaded", () => {updatevalues();})
+document.addEventListener("click", () => {updatevalues();})
