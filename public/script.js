@@ -51,17 +51,22 @@ function loadOrders() {
     fetch('/orders')
         .then(response => response.json())
         .then(data => {
-            ORDERS = data;
-            ORDERS.forEach(orderData => {
-                const order = new Order(orderData.cantity);
-                order.id = orderData.id;
-                order.date = new Date(orderData.date);
-                order.init();  // Inicializa correctamente cada orden con sus datos
+            if (Array.isArray(data.orders)) {
+                ORDERS = data.orders;  // Solo asigna si es un array
+                ORDERS.forEach(orderData => {
+                    const order = new Order(orderData.cantity);
+                    order.id = orderData.id;
+                    order.date = new Date(orderData.date);
+                    order.init();
+                });
                 updatevalues();
-            });
+            } else {
+                console.error('Los datos recibidos no contienen un array en "orders".');
+            }
         })
         .catch(error => console.error('Error al cargar las órdenes:', error));
 }
+
 
 // Agregar una nueva orden
 document.getElementById("addorder").addEventListener("click", () => {
