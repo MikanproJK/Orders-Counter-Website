@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de Pedidos</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="titlecontainer"><span>Contador de Pedidos</span></div>
+    </header>
+    <main>
+        <div class="mainframe">
+            <aside class="barcontent">
+                <div class="pestaincontainer">
+                    <div class="home pestain">
+                        <img src="../images/home_24dp_666666_FILL0_wght400_GRAD0_opsz24.svg" alt="">
+                        <span>Inicio</span>
+                    </div>
+                    <div class="pestain actividad">
+                        <img src="../images/list_alt_24dp_666666_FILL0_wght400_GRAD0_opsz24.svg" alt="">
+                        <span>Actividad</span>
+                    </div>
+                </div>
+            </aside>
+            <div class="content">
+                <div class="framecontent">
+                    <h1 class="sectiontitle">Contador de Pedidos</h1>
+                    <div class="sectors">
+                        <div class="resume">
+                            <div class="resumeinfo">
+                                <span id="totalgains">Total de Ganancias:</span>
+                                <span id="totalorders">Total de Pedidos:</span>
+                                <span id="chargeamount">Monto de Cargos:</span>
+                                <span id="ultimorders">Últimos Pedidos (7d):</span>
+                                <span id="ultimgains">Últimas Ganancias (7d):</span>
+                            </div>
+
+                            <div class="ordersmethod">
+                                <button id="addorder">Agregar Pedido</button>
+                                <button id="clearorders">Limpiar Ultimos Pedidos</button>
+                            </div>
+                        </div>
+                        <div class="activity" id="activity">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
