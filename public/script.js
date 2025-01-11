@@ -51,8 +51,8 @@ function loadOrders() {
     fetch('/orders')
         .then(response => response.json())
         .then(data => {
-            if (Array.isArray(data.orders)) {
-                ORDERS = data.orders;  // Solo asigna si es un array
+            if (data) {
+                ORDERS = data.orders;
                 ORDERS.forEach(orderData => {
                     const order = new Order(orderData.cantity);
                     order.id = orderData.id;

@@ -166,3 +166,9 @@ button {
     margin-right: 5%;
     margin-top: 5%;
 }
+.titlescontainer {
+    display: flex;
+}
+.currentorderstitle {
+    margin-left: 12%;
+}

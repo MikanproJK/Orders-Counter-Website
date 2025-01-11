@@ -27,18 +27,25 @@ app.get('/orders', (req, res) => {
 
 // Endpoint para agregar una nueva orden
 app.post('/orders', (req, res) => {
-    const newOrder = req.body;
-    fs.readFile(ordersFile, (err, data) => {
+    const newOrder = req.body; // Datos del nuevo pedido enviados desde el cliente
+
+    // Leer el archivo JSON
+    fs.readFile(ordersFile, 'utf8', (err, data) => {
         if (err) {
-            return res.status(500).json({ error: 'Error al leer el archivo de órdenes' });
+            return res.status(500).send('Error al leer el archivo JSON');
         }
-        const orders = JSON.parse(data || '[]');
-        orders.push(newOrder);
-        fs.writeFile(ordersFile, JSON.stringify(orders, null, 2), (err) => {
+
+        const jsonData = JSON.parse(data); // Convertir el contenido a un objeto JavaScript
+
+        // Añadir el nuevo pedido al arreglo de orders
+        jsonData.orders.push(newOrder);
+
+        // Escribir el archivo JSON actualizado
+        fs.writeFile(ordersFile, JSON.stringify(jsonData, null, 2), (err) => {
             if (err) {
-                return res.status(500).json({ error: 'Error al guardar la orden' });
+                return res.status(500).send('Error al escribir en el archivo JSON');
             }
-            res.status(201).json(newOrder);
+            res.send('Nuevo pedido añadido correctamente');
         });
     });
 });
