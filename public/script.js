@@ -102,5 +102,8 @@ function updatevalues() {
     document.getElementById("totalgains").textContent = `Total de Ganancias: ${gains}`;
 }
 
-document.addEventListener("DOMContentLoaded", () => {updatevalues();})
+document.addEventListener("DOMContentLoaded", () => {
+    updatevalues();
+    
+})
 document.addEventListener("click", () => {updatevalues();})
