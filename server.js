@@ -51,15 +51,32 @@ app.post('/orders', (req, res) => {
 });
 
 // Endpoint para eliminar una orden
+// Endpoint para eliminar una orden
 app.delete('/orders/:id', (req, res) => {
-    const orderId = parseInt(req.params.id, 10);
-    fs.readFile(ordersFile, (err, data) => {
+    const orderId = parseInt(req.params.id, 10); // Obtener el ID de la orden desde la URL
+    fs.readFile(ordersFile, 'utf8', (err, data) => {
         if (err) {
             return res.status(500).json({ error: 'Error al leer el archivo de órdenes' });
         }
-        let orders = JSON.parse(data || '[]');
-        orders = orders.filter(order => order.id !== orderId);
-        fs.writeFile(ordersFile, JSON.stringify(orders, null, 2), (err) => {
+
+        let ordersdata;
+        try {
+            ordersdata = JSON.parse(data); // Convertir el contenido del archivo a un objeto JSON
+        } catch (parseError) {
+            return res.status(500).json({ error: 'Error al analizar el archivo de órdenes' });
+        }
+
+        // Filtrar la orden a eliminar
+        const updatedOrders = ordersdata.orders.filter(order => order.id !== orderId);
+
+        // Crear un nuevo objeto con las órdenes actualizadas y las órdenes actuales
+        const updatedData = {
+            orders: updatedOrders,
+            currentOrders: ordersdata.currentOrders // Mantener currentOrders sin cambios
+        };
+
+        // Guardar el archivo actualizado
+        fs.writeFile(ordersFile, JSON.stringify(updatedData, null, 2), (err) => {
             if (err) {
                 return res.status(500).json({ error: 'Error al guardar las órdenes' });
             }

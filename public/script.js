@@ -39,7 +39,7 @@ class Order {
             fetch(`/orders/${this.id}`, { method: 'DELETE' })
             .then(() => {
                 this.frame.remove();
-                ORDERS = ORDERS.filter(order => order.id !== this.id);
+                ORDERS.splice(this.id, 1);
             })
             .catch(error => console.error('Error al eliminar la orden:', error));
         }
