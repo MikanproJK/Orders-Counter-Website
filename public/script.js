@@ -88,7 +88,7 @@ function newday(DAY,MONTH,YEAR) {
     frame.innerHTML = dayhtml;
     console.log(dayhtml);
     document.querySelector(".weekcontainer").appendChild(frame);
-    frame.querySelector(".info_day").textContent = `${DAY}-${MONTH+1}-${YEAR}`
+    frame.querySelector(".info_day").textContent = `Dia: ${DAY}-${MONTH+1}-${YEAR}`
 
     DaysArray.push(id)
     console.log(DaysArray)
