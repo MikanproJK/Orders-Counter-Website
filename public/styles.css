@@ -2,6 +2,7 @@
     --background: rgba(255,255,255);
     --contentBackground: rgb(255, 255, 255);
     --textcolor: #3d3d3d;
+    --borderradius: 10px;
 }
 
 
@@ -41,8 +42,8 @@ main {
     box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.247);
     width: 12%;
     height: 100%;
-    border-top-right-radius:  10px;
-    border-bottom-right-radius: 10px;
+    border-top-right-radius:  var(--borderradius);
+    border-bottom-right-radius: var(--borderradius);
     user-select: none;
 }
 .content {
@@ -50,7 +51,7 @@ main {
     margin-left: 1%;
     width: 100%;
     height: 100%;
-    border-radius: 10px;
+    border-radius: var(--borderradius);
     background-color: var(--contentBackground);
     box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.247);
     user-select: none;
@@ -127,7 +128,7 @@ h1 {
 .order {
     background-color: #ffffff;
     box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.247);
-    border-radius: 10px;
+    border-radius: var(--borderradius);
     margin-left: 1%;
     margin-right: 1%;
     margin-top: 1%;
@@ -198,7 +199,7 @@ a {
     margin-left: 2%;
     border-color: #e7e7e7;
     border-style: solid;
-    border-radius: 10px;
+    border-radius: var(--borderradius);
 
     padding: 1%;
 }
@@ -208,7 +209,7 @@ a {
 
     border-color: #e7e7e7;
     border-style: solid;
-    border-radius: 10px;
+    border-radius: var(--borderradius);
 
     padding: 1%;
 }
