@@ -48,13 +48,15 @@ class Order {
         this.frame.querySelector('#orderhour').textContent = `Hora: ${this.date.toLocaleTimeString()}`;
         this.frame.querySelector('.delete').addEventListener('click', () => this.delete());
 
-        const datedaytosearch = this.date.toISOString().split('T')[0];
-        if (!DaysArray.some(day => day === datedaytosearch)) {
-            newday()
-        }
+        const datedaytosearch = this.date.getDate() + "-" + (this.date.getMonth() + 1) + "-" + this.date.getFullYear();
 
+        if (!DaysArray.includes(datedaytosearch)) {
+          DaysArray.push(datedaytosearch);
+          newday(this.date.getDate(), this.date.getMonth(), this.date.getFullYear());
+        }
+        
         document.getElementById(datedaytosearch).appendChild(this.frame);
-        console.log("added frame to activity")
+        console.log("added frame to activity");
     }
 
     delete() {
@@ -70,20 +72,23 @@ class Order {
     }
 }
 
-function newday(){
+function newday(DAY,MONTH,YEAR) {
     const date = new Date();
-    const day = date.getDay();
-    const month = date.getMonth();
-    const year = date.getFullYear();
-    const id = date.toISOString().split('T')[0];
+    const day = date.getDay() || DAY;
+    const month = date.getMonth() || MONTH;
+    const year = date.getFullYear() || YEAR;
+    const id = {DAY,MONTH,YEAR} || date.toISOString().split('T')[0]; 
+    const idstring = `${DAY}-${MONTH+1}-${YEAR}`
     console.log(id);
+    console.log(`${DAY}-${MONTH+1}-${YEAR}`)
 
     const frame = document.createElement("div");
     frame.className = "daypestain";
-    frame.id = id;
+    frame.id = `${DAY}-${MONTH+1}-${YEAR}`
     frame.innerHTML = dayhtml;
     console.log(dayhtml);
     document.querySelector(".weekcontainer").appendChild(frame);
+    frame.querySelector(".info_day").textContent = `${DAY}-${MONTH+1}-${YEAR}`
 
     DaysArray.push(id)
     console.log(DaysArray)
