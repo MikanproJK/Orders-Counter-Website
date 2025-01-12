@@ -1,8 +1,25 @@
 let OrderHTML = '';
+
+// orders array
 let ORDERS = [];
+let currentorders = [];
+
+// contenedores de los pedidos
+let DaysArray = [];
+let WeeksArray = [];
+
+function newday(){
+    const date = new Date();
+    const day = date.getDay();
+    const month = date.getMonth();
+    const year = date.getFullYear();
+    const id = day+month+year;
+    console.log(id);
+}
+newday();
 
 // Cargar la plantilla de HTML
-fetch('order.html')
+fetch('html/order.html')
     .then(response => response.text())
     .then(data => {
         OrderHTML = data;

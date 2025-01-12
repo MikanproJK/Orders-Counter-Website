@@ -172,3 +172,26 @@ button {
 .currentorderstitle {
     margin-left: 12%;
 }
+.framepestain {
+    height: auto;
+    width: 100%;
+}
+.daypestaininfo {
+    display: flex;
+}
+
+a {
+    text-decoration: none;
+    color: #424242;
+}
+
+.weekpestain {
+    margin-left: 2%;
+}
+.daypestain {
+    margin-left: 3%;
+    margin-top: 1%;
+}
+.info_day {
+    margin-left: 1%;
+}
