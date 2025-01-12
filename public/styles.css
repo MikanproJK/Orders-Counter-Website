@@ -223,3 +223,11 @@ a {
     margin-left: 2%;
     margin-top: 0.5%;
 }
+.weekgainscontainer {
+    display: flex;
+    flex-direction:column;
+}
+.titleweek {
+    margin-bottom:0;
+    color: var(--textcolor)
+}
