@@ -187,11 +187,29 @@ a {
 
 .weekpestain {
     margin-left: 2%;
+    border-color: #e7e7e7;
+    border-style: solid;
+    border-radius: 10px;
+
+    padding: 1%;
 }
 .daypestain {
     margin-left: 3%;
     margin-top: 1%;
+
+    border-color: #e7e7e7;
+    border-style: solid;
+    border-radius: 10px;
+
+    padding: 1%;
 }
 .info_day {
     margin-left: 1%;
+}
+.infotext {
+    color: #d4d4d4;
+}
+.dayactivity {
+    margin-left: 2%;
+    margin-top: 0.5%;
 }

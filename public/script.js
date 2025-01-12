@@ -1,4 +1,5 @@
 let OrderHTML = '';
+let dayhtml = '';
 
 // orders array
 let ORDERS = [];
@@ -8,24 +9,23 @@ let currentorders = [];
 let DaysArray = [];
 let WeeksArray = [];
 
-function newday(){
-    const date = new Date();
-    const day = date.getDay();
-    const month = date.getMonth();
-    const year = date.getFullYear();
-    const id = day+month+year;
-    console.log(id);
-}
-newday();
-
 // Cargar la plantilla de HTML
 fetch('html/order.html')
     .then(response => response.text())
     .then(data => {
         OrderHTML = data;
+        console.log(OrderHTML);
         loadOrders(); // Cargar las órdenes del servidor al inicio
     })
     .catch(error => console.error('Error al cargar la plantilla:', error));
+
+fetch("html/day.html")
+    .then(response => response.text())
+    .then(data => {
+        dayhtml = data;
+        console.log("HTML CARGDO", dayhtml);
+    })
+    .catch(error => console.error('Error al cargar la plantilla:', error))
 
 // Clase Order
 class Order {
@@ -38,7 +38,6 @@ class Order {
         this.frame.className = "order";
         this.frame.innerHTML = OrderHTML;
         this.init();
-        document.getElementById("activity").appendChild(this.frame);
     }
 
     init() {
@@ -48,6 +47,14 @@ class Order {
         this.frame.querySelector("#orderday").textContent = `Día: ${this.date.toLocaleDateString()}`;
         this.frame.querySelector('#orderhour').textContent = `Hora: ${this.date.toLocaleTimeString()}`;
         this.frame.querySelector('.delete').addEventListener('click', () => this.delete());
+
+        const datedaytosearch = this.date.toISOString().split('T')[0];
+        if (!DaysArray.some(day => day === datedaytosearch)) {
+            newday()
+        }
+
+        document.getElementById(datedaytosearch).appendChild(this.frame);
+        console.log("added frame to activity")
     }
 
     delete() {
@@ -61,6 +68,25 @@ class Order {
             .catch(error => console.error('Error al eliminar la orden:', error));
         }
     }
+}
+
+function newday(){
+    const date = new Date();
+    const day = date.getDay();
+    const month = date.getMonth();
+    const year = date.getFullYear();
+    const id = date.toISOString().split('T')[0];
+    console.log(id);
+
+    const frame = document.createElement("div");
+    frame.className = "daypestain";
+    frame.id = id;
+    frame.innerHTML = dayhtml;
+    console.log(dayhtml);
+    document.querySelector(".weekcontainer").appendChild(frame);
+
+    DaysArray.push(id)
+    console.log(DaysArray)
 }
 
 // Cargar órdenes del servidor
@@ -91,6 +117,7 @@ document.getElementById("addorder").addEventListener("click", () => {
     if (!isNaN(cantity) && cantity > 0) {
 
         const newOrder = new Order(cantity);
+        newOrder.init()
         ORDERS.push(newOrder);
         updatevalues();
 
@@ -123,4 +150,10 @@ document.addEventListener("DOMContentLoaded", () => {
     updatevalues();
     
 })
-document.addEventListener("click", () => {updatevalues();})
+document.addEventListener("click", () => {
+    updatevalues();
+    if (dayhtml !== '') {
+        console.log("DAYHTML CARGADITOOOOOOOOO");
+        //newday();
+    }
+})
