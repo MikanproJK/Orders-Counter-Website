@@ -93,64 +93,63 @@ function newday(day, month, year) {
     console.log("ID String:", idString);
 
     // Verificar si el día está en una semana existente
-    const weekData = checkDayIsInWeek(date.getDate());
+    let weekData = checkDayIsInWeek(date.getDate());
 
-    if (!weekData || !weekData[1]) {
-        console.log("No se encontró una semana existente. Creando una nueva...");
-        const newWeek = NewWeek();
-        weekData = [true, newWeek]; // Asignar la nueva semana
+    let week = weekData[1];
+    if (!week) {
+        NewWeek()
     }
-
-    const week = weekData[1];
+    weekData = checkDayIsInWeek(date.getDate());
+    week = weekData[1];
     console.log("Week found:", week);
-
-    week.push(id); // Agregar el ID a la semana
-
     console.log(`Week range: ${week.weekStart}-${week.weekEnd}`);
 
     // Crear un nuevo elemento HTML para el día
     const frame = document.createElement("div");
     frame.className = "daypestain";
-    frame.id = idstring
+    frame.id = idString
     frame.innerHTML = dayhtml;
     console.log(dayhtml);
-    document.querySelector(".weekcontainer").appendChild(frame);
-    frame.querySelector(".info_day").textContent = `Dia: ${idstring}`
-
-    if (checkDayIsInWeek(date.getDate())) {
-        //añadir dia a  la semana
-    } else {
-        // crear semana y añadir dia
-    }
+    document.getElementById(`${week.weekStart}-${week.weekEnd}`).appendChild(frame);
+    frame.querySelector(".info_day").textContent = `Dia: ${idtring}`
 
     DaysArray.push(id)
     console.log(DaysArray)
 }
 
 function NewWeek() {
-    // Calcular el inicio y el final de la semana
+    // Calcular el inicio (lunes) y el final (domingo) de la semana
+    const baseDate = new Date(date); // Usar una copia de la fecha global
+    let weekStart = new Date(baseDate);
+    weekStart.setDate(baseDate.getDate() - baseDate.getDay() + 1); // Lunes
 
-    let weekStart = new Date(date);
-    weekStart = (date.getDate() - date.getDay() + 1) + "-" + date.getMonth()+1 + "-" + date.getFullYear(); // Lunes
-    let weekEnd = new Date(date);
-    weekEnd = (date.getDate() - date.getDay() + 7) + "-" + date.getMonth()+1 + "-" + date.getFullYear(); // Domingo
+    let weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6); // Domingo
 
-    let week = { weekStart, weekEnd };
+    // Convertir fechas a formato legible (YYYY-MM-DD)
+    const formattedWeekStart = weekStart.toISOString().split("T")[0];
+    const formattedWeekEnd = weekEnd.toISOString().split("T")[0];
+
+    // Crear objeto semana
+    const week = { weekStart: formattedWeekStart, weekEnd: formattedWeekEnd };
     console.log(week);
 
+    // Crear y añadir un elemento DOM para la semana
     const frame = document.createElement("div");
     frame.className = "weekpestain";
-    frame.id = `${weekStart}-${weekEnd}`;
-    frame.innerHTML = weekhtml;
-    document.getElementById("activity").appendChild(frame)
+    frame.id = `${formattedWeekStart}-${formattedWeekEnd}`;
+    frame.innerHTML = weekhtml; // Se asume que `weekhtml` está definido
+    document.getElementById("activity").appendChild(frame);
 
-    // Almacenar la semana como un objeto
+    // Almacenar la semana en el array
     weekArray.push(week);
-    loadcheckbox()
-    return week
+
+    // Cargar los checkboxes (asumiendo que esta función está definida)
+    loadcheckbox();
 }
 
 function checkDayIsInWeek(day) {
+    // Crear un objeto de fecha para el día a verificar
     const checkDate = new Date(date.getFullYear(), date.getMonth(), day);
 
     for (let i = 0; i < weekArray.length; i++) {
@@ -158,6 +157,7 @@ function checkDayIsInWeek(day) {
         const weekStart = new Date(week.weekStart);
         const weekEnd = new Date(week.weekEnd);
 
+        // Verificar si el día está dentro del rango de la semana
         if (checkDate >= weekStart && checkDate <= weekEnd) {
             return [true, week]; // Devuelve true y la semana encontrada
         }
@@ -165,6 +165,7 @@ function checkDayIsInWeek(day) {
 
     return [false, null]; // Devuelve false si no se encuentra ninguna semana
 }
+
 
 // Cargar órdenes del servidor
 function loadOrders() {
