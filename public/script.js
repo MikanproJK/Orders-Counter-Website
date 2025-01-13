@@ -33,8 +33,8 @@ fetch("html/day.html")
 fetch("html/week.html")
     .then(response => response.text())
     .then(data => {
-        weekhtmll = data;
-        console.log("HTML CARGDO", weekhtmlhtml);
+        weekhtml = data;
+        console.log("HTML CARGDO", weekhtml);
     })
     .catch(error => console.error('Error al cargar la plantilla:', error))
 
@@ -83,13 +83,32 @@ class Order {
     }
 }
 
-function newday(DAY,MONTH,YEAR) {
+function newday(day, month, year) {
     const date = new Date();
-    const id = {DAY,MONTH,YEAR} || date.toISOString().split('T')[0]; 
-    const idstring = `${DAY}-${MONTH+1}-${YEAR}`
-    console.log(id);
-    console.log(`${DAY}-${MONTH+1}-${YEAR}`)
+    const id = { day, month, year } || date.toISOString().split('T')[0];
+    const completeId = date.toISOString().split('T')[0];
+    const idString = `${day}-${month + 1}-${year}`;
 
+    console.log("ID:", id, "Complete ID:", completeId);
+    console.log("ID String:", idString);
+
+    // Verificar si el día está en una semana existente
+    const weekData = checkDayIsInWeek(date.getDate());
+
+    if (!weekData || !weekData[1]) {
+        console.log("No se encontró una semana existente. Creando una nueva...");
+        const newWeek = NewWeek();
+        weekData = [true, newWeek]; // Asignar la nueva semana
+    }
+
+    const week = weekData[1];
+    console.log("Week found:", week);
+
+    week.push(id); // Agregar el ID a la semana
+
+    console.log(`Week range: ${week.weekStart}-${week.weekEnd}`);
+
+    // Crear un nuevo elemento HTML para el día
     const frame = document.createElement("div");
     frame.className = "daypestain";
     frame.id = idstring
@@ -112,27 +131,39 @@ function NewWeek() {
     // Calcular el inicio y el final de la semana
 
     let weekStart = new Date(date);
-    weekStart.setDate(date.getDate() - date.getDay() + 1); // Lunes
+    weekStart = (date.getDate() - date.getDay() + 1) + "-" + date.getMonth()+1 + "-" + date.getFullYear(); // Lunes
     let weekEnd = new Date(date);
-    weekEnd.setDate(date.getDate() - date.getDay() + 7); // Domingo
+    weekEnd = (date.getDate() - date.getDay() + 7) + "-" + date.getMonth()+1 + "-" + date.getFullYear(); // Domingo
+
+    let week = { weekStart, weekEnd };
+    console.log(week);
+
+    const frame = document.createElement("div");
+    frame.className = "weekpestain";
+    frame.id = `${weekStart}-${weekEnd}`;
+    frame.innerHTML = weekhtml;
+    document.getElementById("activity").appendChild(frame)
 
     // Almacenar la semana como un objeto
-    let week = { weekStart, weekEnd };
     weekArray.push(week);
+    loadcheckbox()
+    return week
 }
 
 function checkDayIsInWeek(day) {
-    // Crear un objeto de fecha para el día a verificar
-    let checkDate = new Date(date.getFullYear(), date.getMonth(), day);
-    
+    const checkDate = new Date(date.getFullYear(), date.getMonth(), day);
+
     for (let i = 0; i < weekArray.length; i++) {
-        let week = weekArray[i];
-        // Verificar si el día está dentro del rango de la semana
-        if (checkDate >= week.weekStart && checkDate <= week.weekEnd) {
-            return true;
+        const week = weekArray[i];
+        const weekStart = new Date(week.weekStart);
+        const weekEnd = new Date(week.weekEnd);
+
+        if (checkDate >= weekStart && checkDate <= weekEnd) {
+            return [true, week]; // Devuelve true y la semana encontrada
         }
     }
-    return false; // Retornar false si no se encuentra en ninguna semana
+
+    return [false, null]; // Devuelve false si no se encuentra ninguna semana
 }
 
 // Cargar órdenes del servidor
@@ -204,27 +235,32 @@ document.addEventListener("click", () => {
         //newday();
     }
 })
-const checkbox = document.getElementById("payedButton");
-checkbox.oninput = (event) => {
-    const isChecked = event.target.checked; // Obtener el estado del checkbox (true o false)
-    const weekPestain = event.target.closest(".weekpestain");
 
-    if (weekPestain) {
-        console.log("El contenedor weekpestain fue encontrado:", weekPestain);
-
-        // Aquí puedes realizar acciones con el contenedor `weekpestain`
-        const weekInfo = weekPestain.querySelector(".weekinfo");
-        if (weekInfo) {
-            console.log("Información de la semana:", weekInfo.textContent);
-        }
-
-        // Ejemplo: Cambiar el estilo del contenedor si el checkbox está marcado
-        if (isChecked) {
-            weekPestain.style.backgroundColor = "#dfffde"; // Cambiar el color de fondo
-        } else {
-            weekPestain.style.backgroundColor = ""; // Restaurar el color de fondo
-        }
-    } else {
-        console.log("No se encontró el contenedor weekpestain.");
+function loadcheckbox() {
+    if (weekhtml) {
+        const checkbox = document.getElementById("payedButton");
+        checkbox.oninput = (event) => {
+            const isChecked = event.target.checked; // Obtener el estado del checkbox (true o false)
+            const weekPestain = event.target.closest(".weekpestain");
+    
+            if (weekPestain) {
+                console.log("El contenedor weekpestain fue encontrado:", weekPestain);
+    
+                // Aquí puedes realizar acciones con el contenedor `weekpestain`
+                const weekInfo = weekPestain.querySelector(".weekinfo");
+                if (weekInfo) {
+                    console.log("Información de la semana:", weekInfo.textContent);
+                }
+    
+                // Ejemplo: Cambiar el estilo del contenedor si el checkbox está marcado
+                if (isChecked) {
+                    weekPestain.style.backgroundColor = "#dfffde"; // Cambiar el color de fondo
+                } else {
+                    weekPestain.style.backgroundColor = ""; // Restaurar el color de fondo
+                }
+            } else {
+                console.log("No se encontró el contenedor weekpestain.");
+            }
+        };
     }
-};
+}
