@@ -7,7 +7,9 @@ let currentorders = [];
 
 // contenedores de los pedidos
 let DaysArray = [];
-let WeeksArray = [];
+let weekArray = [];
+
+date = new Date();
 
 // Cargar la plantilla de HTML
 fetch('html/order.html')
@@ -74,9 +76,6 @@ class Order {
 
 function newday(DAY,MONTH,YEAR) {
     const date = new Date();
-    const day = date.getDay() || DAY;
-    const month = date.getMonth() || MONTH;
-    const year = date.getFullYear() || YEAR;
     const id = {DAY,MONTH,YEAR} || date.toISOString().split('T')[0]; 
     const idstring = `${DAY}-${MONTH+1}-${YEAR}`
     console.log(id);
@@ -84,14 +83,47 @@ function newday(DAY,MONTH,YEAR) {
 
     const frame = document.createElement("div");
     frame.className = "daypestain";
-    frame.id = `${DAY}-${MONTH+1}-${YEAR}`
+    frame.id = idstring
     frame.innerHTML = dayhtml;
     console.log(dayhtml);
     document.querySelector(".weekcontainer").appendChild(frame);
-    frame.querySelector(".info_day").textContent = `Dia: ${DAY}-${MONTH+1}-${YEAR}`
+    frame.querySelector(".info_day").textContent = `Dia: ${idstring}`
+
+    if (checkDayIsInWeek(date.getDate())) {
+        //añadir dia a  la semana
+    } else {
+        // crear semana y añadir dia
+    }
 
     DaysArray.push(id)
     console.log(DaysArray)
+}
+
+function NewWeek() {
+    // Calcular el inicio y el final de la semana
+
+    let weekStart = new Date(date);
+    weekStart.setDate(date.getDate() - date.getDay() + 1); // Lunes
+    let weekEnd = new Date(date);
+    weekEnd.setDate(date.getDate() - date.getDay() + 7); // Domingo
+
+    // Almacenar la semana como un objeto
+    let week = { weekStart, weekEnd };
+    weekArray.push(week);
+}
+
+function checkDayIsInWeek(day) {
+    // Crear un objeto de fecha para el día a verificar
+    let checkDate = new Date(date.getFullYear(), date.getMonth(), day);
+    
+    for (let i = 0; i < weekArray.length; i++) {
+        let week = weekArray[i];
+        // Verificar si el día está dentro del rango de la semana
+        if (checkDate >= week.weekStart && checkDate <= week.weekEnd) {
+            return true;
+        }
+    }
+    return false; // Retornar false si no se encuentra en ninguna semana
 }
 
 // Cargar órdenes del servidor

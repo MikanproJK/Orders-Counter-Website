@@ -72,7 +72,8 @@ app.delete('/orders/:id', (req, res) => {
         // Crear un nuevo objeto con las órdenes actualizadas y las órdenes actuales
         const updatedData = {
             orders: updatedOrders,
-            currentOrders: ordersdata.currentOrders // Mantener currentOrders sin cambios
+            currentOrders: ordersdata.currentOrders,
+            errormessages: ordersdata.errormessages,
         };
 
         // Guardar el archivo actualizado
