@@ -1,5 +1,6 @@
 let OrderHTML = '';
 let dayhtml = '';
+let weekhtml = '';
 
 // orders array
 let ORDERS = [];
@@ -26,6 +27,14 @@ fetch("html/day.html")
     .then(data => {
         dayhtml = data;
         console.log("HTML CARGDO", dayhtml);
+    })
+    .catch(error => console.error('Error al cargar la plantilla:', error))
+
+fetch("html/week.html")
+    .then(response => response.text())
+    .then(data => {
+        weekhtmll = data;
+        console.log("HTML CARGDO", weekhtmlhtml);
     })
     .catch(error => console.error('Error al cargar la plantilla:', error))
 
@@ -164,7 +173,8 @@ document.getElementById("addorder").addEventListener("click", () => {
             body: JSON.stringify({
                 id: newOrder.id,
                 cantity: newOrder.cantity,
-                date: newOrder.date.toISOString() // Asegúrate de enviar la fecha en formato ISO
+                date: newOrder.date.toISOString(), // Asegúrate de enviar la fecha en formato ISO
+                payed: false
             })
         })
         .catch(error => console.error('Error al guardar la orden:', error));
@@ -190,7 +200,31 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("click", () => {
     updatevalues();
     if (dayhtml !== '') {
-        console.log("DAYHTML CARGADITOOOOOOOOO");
+        //console.log("DAYHTML CARGADITOOOOOOOOO");
         //newday();
     }
 })
+const checkbox = document.getElementById("payedButton");
+checkbox.oninput = (event) => {
+    const isChecked = event.target.checked; // Obtener el estado del checkbox (true o false)
+    const weekPestain = event.target.closest(".weekpestain");
+
+    if (weekPestain) {
+        console.log("El contenedor weekpestain fue encontrado:", weekPestain);
+
+        // Aquí puedes realizar acciones con el contenedor `weekpestain`
+        const weekInfo = weekPestain.querySelector(".weekinfo");
+        if (weekInfo) {
+            console.log("Información de la semana:", weekInfo.textContent);
+        }
+
+        // Ejemplo: Cambiar el estilo del contenedor si el checkbox está marcado
+        if (isChecked) {
+            weekPestain.style.backgroundColor = "#dfffde"; // Cambiar el color de fondo
+        } else {
+            weekPestain.style.backgroundColor = ""; // Restaurar el color de fondo
+        }
+    } else {
+        console.log("No se encontró el contenedor weekpestain.");
+    }
+};

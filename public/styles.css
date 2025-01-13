@@ -211,6 +211,7 @@ a {
     border-color: #e7e7e7;
     border-style: solid;
     border-radius: var(--borderradius);
+    background-color: var(--background);
 
     padding: 1%;
 }
@@ -234,4 +235,7 @@ a {
 }
 .weekcontainer {
     height: 100%;
+}
+#weekpayedtext {
+    margin-left: 2%;
 }
