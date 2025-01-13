@@ -119,6 +119,7 @@ h1 {
 }
 .activity {
     width: 80%;
+    height: 95%;
     overflow-y: auto;
 }
 .resume span {
@@ -230,4 +231,7 @@ a {
 .titleweek {
     margin-bottom:0;
     color: var(--textcolor)
+}
+.weekcontainer {
+    height: 100%;
 }
