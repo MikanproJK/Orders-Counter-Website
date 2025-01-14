@@ -93,28 +93,35 @@ function newday(day, month, year) {
     console.log("ID String:", idString);
 
     // Verificar si el día está en una semana existente
-    let weekData = checkDayIsInWeek(date.getDate());
+    const weekData = checkDayIsInWeek(date.getDate());
+    let week = weekData ? weekData[1] : null;
 
-    let week = weekData[1];
     if (!week) {
-        NewWeek()
+        console.log("No se encontró una semana existente. Creando una nueva...");
+        const newWeek = NewWeek();
+        week = newWeek[1]; // Asignar la nueva semana
     }
-    weekData = checkDayIsInWeek(date.getDate());
-    week = weekData[1];
+
     console.log("Week found:", week);
+
     console.log(`Week range: ${week.weekStart}-${week.weekEnd}`);
 
     // Crear un nuevo elemento HTML para el día
     const frame = document.createElement("div");
     frame.className = "daypestain";
-    frame.id = idString
+    frame.id = idString;
     frame.innerHTML = dayhtml;
-    console.log(dayhtml);
-    document.getElementById(`${week.weekStart}-${week.weekEnd}`).appendChild(frame);
-    frame.querySelector(".info_day").textContent = `Dia: ${idtring}`
 
-    DaysArray.push(id)
-    console.log(DaysArray)
+    console.log("Day HTML:", dayhtml);
+    console.log("Week data:", week);
+
+    // Agregar el elemento al contenedor de la semana
+    const weekContainerId = `${week.weekStart}-${week.weekEnd}`;
+    document.getElementById(weekContainerId).appendChild(frame);
+
+    // Agregar el ID al array de días
+    DaysArray.push(id);
+    console.log("Days Array:", DaysArray);
 }
 
 function NewWeek() {
@@ -146,6 +153,7 @@ function NewWeek() {
 
     // Cargar los checkboxes (asumiendo que esta función está definida)
     loadcheckbox();
+    return [true, week];
 }
 
 function checkDayIsInWeek(day) {

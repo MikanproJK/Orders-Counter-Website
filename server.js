@@ -51,7 +51,6 @@ app.post('/orders', (req, res) => {
 });
 
 // Endpoint para eliminar una orden
-// Endpoint para eliminar una orden
 app.delete('/orders/:id', (req, res) => {
     const orderId = parseInt(req.params.id, 10); // Obtener el ID de la orden desde la URL
     fs.readFile(ordersFile, 'utf8', (err, data) => {
@@ -69,11 +68,11 @@ app.delete('/orders/:id', (req, res) => {
         // Filtrar la orden a eliminar
         const updatedOrders = ordersdata.orders.filter(order => order.id !== orderId);
 
-        // Crear un nuevo objeto con las órdenes actualizadas y las órdenes actuales
-        const updatedData = {
+        // Crear un nuevo objeto preservando las propiedades originales
+        let updatedData = {
             orders: updatedOrders,
-            currentOrders: ordersdata.currentOrders,
-            errormessages: ordersdata.errormessages,
+            currentOrders: ordersdata.currentOrders || [], // Mantener si está vacío
+            errormessages: ordersdata.errormessages || [], // Mantener si no existe
         };
 
         // Guardar el archivo actualizado
@@ -81,10 +80,12 @@ app.delete('/orders/:id', (req, res) => {
             if (err) {
                 return res.status(500).json({ error: 'Error al guardar las órdenes' });
             }
-            res.status(200).json({ message: 'Orden eliminada' });
+            res.status(200).json({ message: 'Orden eliminada', orders: updatedOrders });
         });
     });
 });
+
+
 
 app.listen(PORT, () => {
     console.log(`Servidor escuchando en http://localhost:${PORT}`);
