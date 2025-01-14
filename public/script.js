@@ -10,7 +10,7 @@ let currentorders = [];
 let DaysArray = [];
 let weekArray = [];
 
-let OrdersCharged = false;
+let OrdersCharged = false;// unused
 
 let ErrorMessages = [];
 
@@ -21,7 +21,6 @@ fetch('html/order.html')
     .then(response => response.text())
     .then(data => {
         OrderHTML = data;
-        console.log(OrderHTML);
         loadOrders(); // Cargar las órdenes del servidor al inicio
     })
     .catch(error => console.error('Error al cargar la plantilla:', error));
@@ -30,7 +29,6 @@ fetch("html/day.html")
     .then(response => response.text())
     .then(data => {
         dayhtml = data;
-        console.log("HTML CARGDO", dayhtml);
     })
     .catch(error => console.error('Error al cargar la plantilla:', error))
 
@@ -38,7 +36,6 @@ fetch("html/week.html")
     .then(response => response.text())
     .then(data => {
         weekhtml = data;
-        console.log("HTML CARGDO", weekhtml);
     })
     .catch(error => console.error('Error al cargar la plantilla:', error))
 
@@ -65,13 +62,12 @@ class Order {
 
         const datedaytosearch = this.date.getDate() + "-" + (this.date.getMonth() + 1) + "-" + this.date.getFullYear();
 
-        if (!DaysArray.includes(datedaytosearch)) {
+        if (!DaysArray.includes(datedaytosearch)) { // si no existe un dia con la fecha de order crea uno nuevo
           DaysArray.push(datedaytosearch);
           newday(this.date.getDate(), this.date.getMonth(), this.date.getFullYear());
         }
         
         document.getElementById(datedaytosearch).querySelector(".dayactivity").appendChild(this.frame);
-        console.log("added frame to activity");
     }
 
     delete() {
@@ -95,22 +91,14 @@ function newday(day, month, year) {
     const completeId = date.toISOString().split('T')[0];
     const idString = `${day}-${month + 1}-${year}`;
 
-    console.log("ID:", id, "Complete ID:", completeId);
-    console.log("ID String:", idString);
-
     // Verificar si el día está en una semana existente
     const weekData = checkDayIsInWeek(date.getDate());
     let week = weekData ? weekData[1] : null;
 
     if (!week) {
-        console.log("No se encontró una semana existente. Creando una nueva...");
         const newWeek = NewWeek();
         week = newWeek[1]; // Asignar la nueva semana
     }
-
-    console.log("Week found:", week);
-
-    console.log(`Week range: ${week.weekStart}-${week.weekEnd}`);
 
     // Crear un nuevo elemento HTML para el día
     const frame = document.createElement("div");
@@ -118,16 +106,12 @@ function newday(day, month, year) {
     frame.id = idString;
     frame.innerHTML = dayhtml;
 
-    console.log("Day HTML:", dayhtml);
-    console.log("Week data:", week);
-
     // Agregar el elemento al contenedor de la semana
     const weekContainerId = `${week.weekStart}-${week.weekEnd}`;
     document.getElementById(weekContainerId).querySelector(".weekcontainer").appendChild(frame);
 
     // Agregar el ID al array de días
     DaysArray.push(id);
-    console.log("Days Array:", DaysArray);
 }
 
 function NewWeek() {
@@ -145,7 +129,6 @@ function NewWeek() {
 
     // Crear objeto semana
     const week = { weekStart: formattedWeekStart, weekEnd: formattedWeekEnd };
-    console.log(week);
 
     // Crear y añadir un elemento DOM para la semana
     const frame = document.createElement("div");
@@ -197,7 +180,6 @@ function loadOrders() {
                 errormessages = data.errormessages;
                 errormessages.forEach(errorMessage => {
                     ErrorMessages.push(errorMessage);
-                    console.log(errorMessage);
                 })
                 updatevalues();
                 OrdersCharged = true
@@ -244,7 +226,7 @@ function updatevalues() {
         if (element.id == 1) {
             if (orders == 0) {
                 if (!document.getElementById(element.name)) {
-                    let messageerror = document.createElement("span")
+                    let messageerror = document.createElement("span") //si no hay orders se crea el mensaje
                     messageerror.textContent = element.message;
                     messageerror.classList.add("infotext");
                     messageerror.id = `${element.name}`;
@@ -258,6 +240,7 @@ function updatevalues() {
             }
         }
     });
+
     let gains = orders * 500
     document.getElementById("totalorders").textContent = `Total de Pedidos: ${orders}`;
     document.getElementById("totalgains").textContent = `Total de Ganancias: ${gains}`;
@@ -266,13 +249,6 @@ function updatevalues() {
 document.addEventListener("DOMContentLoaded", () => {
     updatevalues();
     
-})
-document.addEventListener("click", () => {
-    updatevalues();
-    if (dayhtml !== '') {
-        //console.log("DAYHTML CARGADITOOOOOOOOO");
-        //newday();
-    }
 })
 
 function loadcheckbox() {
@@ -283,14 +259,8 @@ function loadcheckbox() {
             const weekPestain = event.target.closest(".weekpestain");
     
             if (weekPestain) {
-                console.log("El contenedor weekpestain fue encontrado:", weekPestain);
-    
                 // Aquí puedes realizar acciones con el contenedor `weekpestain`
                 const weekInfo = weekPestain.querySelector(".weekinfo");
-                if (weekInfo) {
-                    console.log("Información de la semana:", weekInfo.textContent);
-                }
-    
                 // Ejemplo: Cambiar el estilo del contenedor si el checkbox está marcado
                 if (isChecked) {
                     weekPestain.style.backgroundColor = "#dfffde"; // Cambiar el color de fondo
