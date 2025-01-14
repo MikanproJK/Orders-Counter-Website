@@ -10,6 +10,10 @@ let currentorders = [];
 let DaysArray = [];
 let weekArray = [];
 
+let OrdersCharged = false;
+
+let ErrorMessages = [];
+
 date = new Date();
 
 // Cargar la plantilla de HTML
@@ -66,7 +70,7 @@ class Order {
           newday(this.date.getDate(), this.date.getMonth(), this.date.getFullYear());
         }
         
-        document.getElementById(datedaytosearch).appendChild(this.frame);
+        document.getElementById(datedaytosearch).querySelector(".dayactivity").appendChild(this.frame);
         console.log("added frame to activity");
     }
 
@@ -77,6 +81,8 @@ class Order {
             .then(() => {
                 this.frame.remove();
                 ORDERS.splice(this.id, 1);
+                document.removeChild(this.frame.closest('.weekpestain'))
+                document.removeChild(this.frame.closest('.daypestain'))
             })
             .catch(error => console.error('Error al eliminar la orden:', error));
         }
@@ -117,7 +123,7 @@ function newday(day, month, year) {
 
     // Agregar el elemento al contenedor de la semana
     const weekContainerId = `${week.weekStart}-${week.weekEnd}`;
-    document.getElementById(weekContainerId).appendChild(frame);
+    document.getElementById(weekContainerId).querySelector(".weekcontainer").appendChild(frame);
 
     // Agregar el ID al array de días
     DaysArray.push(id);
@@ -188,7 +194,13 @@ function loadOrders() {
                     order.date = new Date(orderData.date);
                     order.init();
                 });
+                errormessages = data.errormessages;
+                errormessages.forEach(errorMessage => {
+                    ErrorMessages.push(errorMessage);
+                    console.log(errorMessage);
+                })
                 updatevalues();
+                OrdersCharged = true
             } else {
                 console.error('Los datos recibidos no contienen un array en "orders".');
             }
@@ -228,6 +240,24 @@ function updatevalues() {
     ORDERS.forEach(orderData => {
         orders += orderData.cantity;
     })
+    ErrorMessages.forEach(element => {
+        if (element.id == 1) {
+            if (orders == 0) {
+                if (!document.getElementById(element.name)) {
+                    let messageerror = document.createElement("span")
+                    messageerror.textContent = element.message;
+                    messageerror.classList.add("infotext");
+                    messageerror.id = `${element.name}`;
+                    messageerror.style.marginLeft = "2%";
+                    document.getElementById("activity").appendChild(messageerror);
+                }
+            } else {
+                if (document.getElementById(element.name)) {
+                    document.getElementById("activity").removeChild(document.getElementById(element.name));
+                }
+            }
+        }
+    });
     let gains = orders * 500
     document.getElementById("totalorders").textContent = `Total de Pedidos: ${orders}`;
     document.getElementById("totalgains").textContent = `Total de Ganancias: ${gains}`;
@@ -273,3 +303,6 @@ function loadcheckbox() {
         };
     }
 }
+setInterval(() => {
+    updatevalues();
+})
