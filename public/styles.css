@@ -108,15 +108,7 @@ h1 {
     flex-direction: column;
     justify-content: space-between;
 }
-.resume::after {
-    content: "";
-    display: block;
-    background-color: #e2e2e2;
-    width: 2px;
-    height: 81%;
-    position: absolute;
-    right: 70.3%;
-}
+
 .activity {
     width: 80%;
     height: 95%;
@@ -239,4 +231,8 @@ a {
 }
 #weekpayedtext {
     margin-left: 2%;
+}
+.activity {
+    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.247);
+    border-radius: var(--borderradius);
 }
