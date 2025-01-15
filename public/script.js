@@ -138,6 +138,7 @@ function NewWeek() {
     frame.className = "weekpestain";
     frame.id = `${id}`;
     frame.innerHTML = weekhtml; // Se asume que `weekhtml` está definido
+    frame.querySelector(".info_day").textContent = `Semana: ${formattedWeekStart} - ${formattedWeekEnd}`;
     document.getElementById("activity").appendChild(frame);
 
     // Almacenar la semana en el array
@@ -148,11 +149,6 @@ function NewWeek() {
     return [true, week];
 }
 
-function editweek(id){
-    // Buscar la semana en el array
-    const weekIndex = weekArray.findIndex(week => week.id === id);
-
-}
 function editorder(id,date,quantity,payed){
     // Buscar el día en el array
     const orderIndex = ORDERS.findIndex(order => order.id === id);
@@ -325,24 +321,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                     return response.json();
                 })
-                .then(updatedOrder => {
-                    console.log('Orden actualizada:', updatedOrder);
-                })
                 .catch(error => {
                     console.error('Error al actualizar la orden:', error);
                 });
             });
-    
-            console.log(weekOrders, ORDERS);
         }
     });
 });
-
-function updateorderspayed() {
-    ORDERS.forEach(orderData => {
-        const orderdate = orderData.date
-    })
-}
 
 function loadcheckbox() {
     if (weekhtml) {
