@@ -18,7 +18,7 @@ body {
 }
 header {
     background-color: black;
-    height: 7vh;
+    height: 7%;
     width: 100vw;
 }
 header span {
@@ -27,10 +27,11 @@ header span {
     font-size: 20px;
 }
 main {
-    height: 100vh;
+    height: 93%;
     width: 100vw;
     display: flex;
 }
+
 .mainframe {
     width: 100vw;
     margin-top: 1%;
@@ -113,6 +114,8 @@ h1 {
     width: 80%;
     height: 95%;
     overflow-y: auto;
+    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.247);
+    border-radius: var(--borderradius);
 }
 .resume span {
     color: var(--textcolor);
@@ -231,8 +234,4 @@ a {
 }
 #weekpayedtext {
     margin-left: 2%;
-}
-.activity {
-    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.247);
-    border-radius: var(--borderradius);
 }

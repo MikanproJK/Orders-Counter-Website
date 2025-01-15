@@ -228,7 +228,6 @@ document.getElementById("addorder").addEventListener("click", () => {
         const newOrder = new Order(cantity);
         newOrder.init()
         ORDERS.push(newOrder);
-        updatevalues();
 
         fetch('/orders', {
             method: 'POST',
@@ -241,43 +240,46 @@ document.getElementById("addorder").addEventListener("click", () => {
             })
         })
         .catch(error => console.error('Error al guardar la orden:', error));
+        updatevalues();
     } else {
         alert("Por favor, ingresa un número válido.");
     }
 });
 
 function updatevalues() {
-    let orders = 0
-    let ordersnotpayed = 0
+    let orders = 0, ordersnotpayed = 0;
+
     ORDERS.forEach(orderData => {
         orders += orderData.cantity;
-        if (orderData.payed == false) {
+        if (!orderData.payed) {
             ordersnotpayed += orderData.cantity;
-        }
-    })
-    ErrorMessages.forEach(element => {
-        if (element.id == 1) {
-            if (orders == 0) {
-                if (!document.getElementById(element.name)) {
-                    let messageerror = document.createElement("span") //si no hay orders se crea el mensaje
-                    messageerror.textContent = element.message;
-                    messageerror.classList.add("infotext");
-                    messageerror.id = `${element.name}`;
-                    messageerror.style.marginLeft = "2%";
-                    document.getElementById("activity").appendChild(messageerror);
-                }
-            } else {
-                if (document.getElementById(element.name)) {
-                    document.getElementById("activity").removeChild(document.getElementById(element.name));
-                }
-            }
         }
     });
 
-    let gains = ordersnotpayed * 500
-    document.getElementById("totalorders").textContent = `Total de Pedidos: ${ordersnotpayed}`;
-    document.getElementById("totalgains").textContent = `Total de Ganancias: ${gains}`;
+    let totalgains = orders * 500;
+    let ultimgains = ordersnotpayed * 500;
+    document.getElementById("totalorders").textContent = `Total de Pedidos: ${orders}`;
+    document.getElementById("totalgains").textContent = `Total de Ganancias: ${totalgains}`;
+    document.getElementById("ultimorders").textContent = `Pedidos: ${ordersnotpayed}`;
+    document.getElementById("ultimgains").textContent = `Ganancias: ${ultimgains}`;
+    document.getElementById("chargeamount").textContent = `Monto de cargos: ${ultimgains}`
+
+    ErrorMessages.forEach(element => {
+        const errorElement = document.getElementById(element.name);
+
+        if (orders === 0 && !errorElement) {
+            let messageError = document.createElement("span");
+            messageError.textContent = element.message;
+            messageError.classList.add("infotext");
+            messageError.id = element.name;
+            messageError.style.marginLeft = "2%";
+            document.getElementById("activity").appendChild(messageError);
+        } else if (orders > 0 && errorElement) {
+            errorElement.remove();
+        }
+    });
 }
+
 
 document.addEventListener("DOMContentLoaded", () => {
     updatevalues();
@@ -364,10 +366,9 @@ function updateweeks(){
         })
     }
 }
-
-console.log(weekArray)
-console.log(ORDERS)
 setInterval(() => {
-    updatevalues();
-    updateweeks();
-})
+    if (OrdersCharged) {
+        updatevalues();
+        updateweeks();
+    }
+}, 500); // Ejecuta cada 1 segundo
