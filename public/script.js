@@ -86,38 +86,39 @@ class Order {
 }
 
 function newday(day, month, year) {
-    const date = new Date();
-    const id = { day, month, year } || date.toISOString().split('T')[0];
-    const completeId = date.toISOString().split('T')[0];
-    const idString = `${day}-${month + 1}-${year}`;
+    // Crear la fecha correctamente con año, mes y día
+    const date = new Date(year, month, day);
+    const id = `${day}-${month + 1}-${year}`; // Formato: DD-MM-YYYY
 
     // Verificar si el día está en una semana existente
     const weekData = checkDayIsInWeek(date.getDate());
-    let week = weekData ? weekData[1] : null;
+    let week = weekData[1];
 
     if (!week) {
-        const newWeek = NewWeek();
+        console.log(`El día no está en una semana existente: ${date.getDate()}, ${week}`);
+        const newWeek = NewWeek(date);
         week = newWeek[1]; // Asignar la nueva semana
+        console.log(`Nueva semana creada: ${week.id}`);
     }
 
     // Crear un nuevo elemento HTML para el día
     const frame = document.createElement("div");
     frame.className = "daypestain";
-    frame.id = idString;
+    frame.id = id;
     frame.innerHTML = dayhtml;
-    frame.querySelector(".info_day").textContent = `Dia: ${day}-${month + 1}-${year}`;
+    frame.querySelector(".info_day").textContent = `Día: ${day}-${month + 1}-${year}`;
 
     // Agregar el elemento al contenedor de la semana
-    const weekContainerId = `${week.weekStart}-${week.weekEnd}`;
+    const weekContainerId = `${week.id}`;
     document.getElementById(weekContainerId).querySelector(".weekcontainer").appendChild(frame);
 
     // Agregar el ID al array de días
     DaysArray.push(id);
 }
 
-function NewWeek() {
+function NewWeek(date) {
     // Calcular el inicio (lunes) y el final (domingo) de la semana
-    const baseDate = new Date(date); // Usar una copia de la fecha global
+    const baseDate = new Date(date.getFullYear(), date.getMonth(), date.getDate()) || new Date(); // Usar una copia de la fecha global
     let weekStart = new Date(baseDate);
     weekStart.setDate(baseDate.getDate() - baseDate.getDay() + 1); // Lunes
 
@@ -247,8 +248,12 @@ document.getElementById("addorder").addEventListener("click", () => {
 
 function updatevalues() {
     let orders = 0
+    let ordersnotpayed = 0
     ORDERS.forEach(orderData => {
         orders += orderData.cantity;
+        if (orderData.payed == false) {
+            ordersnotpayed += orderData.cantity;
+        }
     })
     ErrorMessages.forEach(element => {
         if (element.id == 1) {
@@ -269,8 +274,8 @@ function updatevalues() {
         }
     });
 
-    let gains = orders * 500
-    document.getElementById("totalorders").textContent = `Total de Pedidos: ${orders}`;
+    let gains = ordersnotpayed * 500
+    document.getElementById("totalorders").textContent = `Total de Pedidos: ${ordersnotpayed}`;
     document.getElementById("totalgains").textContent = `Total de Ganancias: ${gains}`;
 }
 
