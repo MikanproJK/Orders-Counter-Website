@@ -105,6 +105,7 @@ function newday(day, month, year) {
     frame.className = "daypestain";
     frame.id = idString;
     frame.innerHTML = dayhtml;
+    frame.querySelector(".info_day").textContent = `Dia: ${day}-${month + 1}-${year}`;
 
     // Agregar el elemento al contenedor de la semana
     const weekContainerId = `${week.weekStart}-${week.weekEnd}`;
@@ -127,13 +128,15 @@ function NewWeek() {
     const formattedWeekStart = weekStart.toISOString().split("T")[0];
     const formattedWeekEnd = weekEnd.toISOString().split("T")[0];
 
+    const id = formattedWeekStart + "-" + formattedWeekEnd
+
     // Crear objeto semana
-    const week = { weekStart: formattedWeekStart, weekEnd: formattedWeekEnd };
+    const week = { weekStart: formattedWeekStart, weekEnd: formattedWeekEnd, payed: false, id: id};
 
     // Crear y añadir un elemento DOM para la semana
     const frame = document.createElement("div");
     frame.className = "weekpestain";
-    frame.id = `${formattedWeekStart}-${formattedWeekEnd}`;
+    frame.id = `${id}`;
     frame.innerHTML = weekhtml; // Se asume que `weekhtml` está definido
     document.getElementById("activity").appendChild(frame);
 
@@ -143,6 +146,37 @@ function NewWeek() {
     // Cargar los checkboxes (asumiendo que esta función está definida)
     loadcheckbox();
     return [true, week];
+}
+
+function editweek(id){
+    // Buscar la semana en el array
+    const weekIndex = weekArray.findIndex(week => week.id === id);
+
+}
+function editorder(id,date,quantity,payed){
+    // Buscar el día en el array
+    const orderIndex = ORDERS.findIndex(order => order.id === id);
+
+    // Actualizar la información del día
+
+    //si existe el cambio lo actualiza
+    if (orderIndex !== -1) {
+        if (date) {
+            ORDERS[orderIndex].date = date;
+        }
+        if (quantity) {
+            ORDERS[orderIndex].cantity = quantity;
+        }
+        if (payed) {
+            ORDERS[orderIndex].payed = payed;
+        }
+        fetch(`/orders/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(ORDERS[orderIndex])
+        })
+    console.error("No se encontró la orden con el ID proporcionado.");
+    }
 }
 
 function checkDayIsInWeek(day) {
@@ -248,12 +282,71 @@ function updatevalues() {
 
 document.addEventListener("DOMContentLoaded", () => {
     updatevalues();
+
+    // Agregar un evento de clic al botón de pagar una semana
+    document.body.addEventListener("input", (event) => {
+        if (event.target.classList.contains("payedButton")) {
+            const weekElement = event.target.closest(".weekpestain");
+            const weekId = weekElement.id;
+
+            const checkbox = event.target;
     
-})
+            const week = weekArray.find(week => week.id === weekId);
+            if (!week) return;
+    
+            week.payed = true;
+    
+            let weekOrders = [];
+    
+            ORDERS.forEach(orderData => {
+                let checkfactor = checkDayIsInWeek(new Date(orderData.date).getDate());
+                if (checkfactor[0] && checkfactor[1].id === weekId) {
+                    weekOrders.push(orderData);
+                }
+            });
+    
+            // Actualizar cada orden de la semana
+            weekOrders.forEach(orderData => {
+                if (checkbox.checked) {
+                    orderData.payed = true;
+                } else {
+                    orderData.payed = false;
+                }
+    
+                // Llamar al endpoint para actualizar la orden
+                fetch(`/orders/${orderData.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error al actualizar la orden: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(updatedOrder => {
+                    console.log('Orden actualizada:', updatedOrder);
+                })
+                .catch(error => {
+                    console.error('Error al actualizar la orden:', error);
+                });
+            });
+    
+            console.log(weekOrders, ORDERS);
+        }
+    });
+});
+
+function updateorderspayed() {
+    ORDERS.forEach(orderData => {
+        const orderdate = orderData.date
+    })
+}
 
 function loadcheckbox() {
     if (weekhtml) {
-        const checkbox = document.getElementById("payedButton");
+        const checkbox = document.querySelectorAll(".payedButton");
         checkbox.oninput = (event) => {
             const isChecked = event.target.checked; // Obtener el estado del checkbox (true o false)
             const weekPestain = event.target.closest(".weekpestain");
@@ -273,6 +366,9 @@ function loadcheckbox() {
         };
     }
 }
+
+console.log(weekArray)
+console.log(ORDERS)
 setInterval(() => {
     updatevalues();
 })

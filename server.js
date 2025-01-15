@@ -50,6 +50,66 @@ app.post('/orders', (req, res) => {
     });
 });
 
+// Endpoint para actualizar una orden
+let isUpdating = false; // Variable de bloqueo
+
+app.put('/orders/:id', async (req, res) => {
+    const orderId = parseInt(req.params.id, 10);
+    const updatedOrder = req.body;
+
+    console.log(updatedOrder);
+
+    if (isNaN(orderId)) {
+        return res.status(400).json({ error: 'Invalid order ID' });
+    }
+
+    if (!updatedOrder || Object.keys(updatedOrder).length === 0) {
+        return res.status(400).json({ error: 'No data provided to update the order' });
+    }
+
+    // Esperar hasta que no haya otra actualización en curso
+    while (isUpdating) {
+        await new Promise(resolve => setTimeout(resolve, 100)); // Esperar 100 ms
+    }
+
+    isUpdating = true; // Bloquear actualizaciones
+
+    try {
+        const data = await fs.promises.readFile(ordersFile, 'utf8');
+        let ordersData;
+
+        try {
+            ordersData = JSON.parse(data);
+        } catch (parseError) {
+            console.error('Error parsing orders file:', parseError);
+            return res.status(500).json({ error: 'Invalid JSON format in orders file' });
+        }
+
+        const orderIndex = ordersData.orders.findIndex(order => order.id === orderId);
+        if (orderIndex === -1) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        // Log before update
+        console.log('Order Before Update:', ordersData.orders[orderIndex]);
+
+        // Update the order
+        ordersData.orders[orderIndex] = { ...ordersData.orders[orderIndex], ...updatedOrder };
+
+        // Log after update
+        console.log('Order After Update:', ordersData.orders[orderIndex]);
+
+        await fs.promises.writeFile(ordersFile, JSON.stringify(ordersData, null, 2));
+
+        res.status(200).json({ message: 'Order updated successfully', order: ordersData.orders[orderIndex] });
+    } catch (err) {
+        console.error('Error processing order update:', err);
+        return res.status(500).json({ error: 'Failed to update order' });
+    } finally {
+        isUpdating = false; // Liberar el bloqueo
+    }
+});
+
 // Endpoint para eliminar una orden
 app.delete('/orders/:id', (req, res) => {
     const orderId = parseInt(req.params.id, 10); // Obtener el ID de la orden desde la URL
