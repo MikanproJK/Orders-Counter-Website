@@ -144,8 +144,6 @@ function NewWeek() {
     // Almacenar la semana en el array
     weekArray.push(week);
 
-    // Cargar los checkboxes (asumiendo que esta función está definida)
-    loadcheckbox();
     return [true, week];
 }
 
@@ -329,26 +327,36 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-function loadcheckbox() {
-    if (weekhtml) {
-        const checkbox = document.querySelectorAll(".payedButton");
-        checkbox.oninput = (event) => {
-            const isChecked = event.target.checked; // Obtener el estado del checkbox (true o false)
-            const weekPestain = event.target.closest(".weekpestain");
+function updateweeks(){
+    if (weekArray){
+        weekArray.forEach(week => {
+            let weekOrders = [];
+
+            let allpayed = true;
     
-            if (weekPestain) {
-                // Aquí puedes realizar acciones con el contenedor `weekpestain`
-                const weekInfo = weekPestain.querySelector(".weekinfo");
-                // Ejemplo: Cambiar el estilo del contenedor si el checkbox está marcado
-                if (isChecked) {
-                    weekPestain.style.backgroundColor = "#dfffde"; // Cambiar el color de fondo
-                } else {
-                    weekPestain.style.backgroundColor = ""; // Restaurar el color de fondo
+            ORDERS.forEach(orderData => {
+                let checkfactor = checkDayIsInWeek(new Date(orderData.date).getDate());
+                if (checkfactor[0] && checkfactor[1].id === week.id) {
+                    weekOrders.push(orderData);
                 }
-            } else {
-                console.log("No se encontró el contenedor weekpestain.");
+            });
+
+            weekOrders.forEach(orderData => {
+                if (!orderData.payed) {
+                    allpayed = false;
+                }
+            });
+
+            const weekElement = document.getElementById(week.id);
+
+            if (allpayed){
+                weekElement.querySelector(".payedButton").checked = true;
+                weekElement.style.backgroundColor = "#f1ffed";
+            }else{
+                weekElement.querySelector(".payedButton").checked = false;
+                weekElement.style.backgroundColor = "";
             }
-        };
+        })
     }
 }
 
@@ -356,4 +364,5 @@ console.log(weekArray)
 console.log(ORDERS)
 setInterval(() => {
     updatevalues();
+    updateweeks();
 })
