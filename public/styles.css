@@ -15,6 +15,8 @@ body {
     flex-direction: column;
     overflow: hidden;
     background-color: var(--background);
+
+    position: absolute;
 }
 header {
     background-color: black;
@@ -194,7 +196,7 @@ a {
 
 .weekpestain {
     margin-left: 2%;
-    margin-top: 2%;
+    margin-bottom: 2%;
     margin-right: 2%;
     border-color: #e7e7e7;
     border-style: solid;
@@ -250,6 +252,21 @@ a {
     background-color: #ffffff;
     box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.349);
     cursor: pointer;
+}
+.filters {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    z-index: 2;
+    margin-left: 3%;
+
+    display: none;
+}
+.options {
+    display: flex;
+    margin-left: 2%;
+    margin-top: 1%;
+    margin-bottom: 1%;
 }
 
 /* Media Queries para dispositivos móviles */

@@ -139,7 +139,7 @@ function NewWeek(date) {
     frame.id = `${id}`;
     frame.innerHTML = weekhtml; // Se asume que `weekhtml` está definido
     frame.querySelector(".info_day").textContent = `Semana: ${formattedWeekStart} - ${formattedWeekEnd}`;
-    document.getElementById("activity").appendChild(frame);
+    document.getElementById("orderscontainer").appendChild(frame);
 
     // Almacenar la semana en el array
     weekArray.push(week);
@@ -366,6 +366,17 @@ function updateweeks(){
         })
     }
 }
+let openfilters = false;
+
+document.getElementById("filtersbutton").addEventListener("click", () => {
+    if (openfilters) {
+        document.querySelector(".filters").style.display = "none";
+        openfilters = false;
+    } else {
+        document.querySelector(".filters").style.display = "block";
+        openfilters = true;
+    }
+});
 setInterval(() => {
     if (OrdersCharged) {
         updatevalues();
