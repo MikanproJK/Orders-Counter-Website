@@ -10,7 +10,7 @@ let currentorders = [];
 let DaysArray = [];
 let weekArray = [];
 
-let OrdersCharged = false;// unused
+let OrdersCharged = false;
 
 let ErrorMessages = [];
 
@@ -184,7 +184,6 @@ function checkDayIsInWeek(day) {
 
         // Verificar si el día está dentro del rango de la semana
         if (checkDate >= weekStart && checkDate <= weekEnd) {
-            console.log(`El día ${day} está en la semana ${week.id}`);
             return [true, week]; // Devuelve true y la semana encontrada
         }
     }
@@ -218,6 +217,19 @@ function loadOrders() {
         })
         .catch(error => console.error('Error al cargar las órdenes:', error));
 }
+
+function removeallorders(){
+    OrdersCharged = false;
+    ORDERS = [];
+    DaysArray = [];
+    weekArray = [];
+    updatevalues();
+    document.getElementById("orderscontainer").innerHTML = "";
+}
+document.getElementById("searchb").addEventListener("click", () => {
+    removeallorders();
+    loadOrders();
+});
 
 
 // Agregar una nueva orden
@@ -368,7 +380,7 @@ function updateweeks(){
 }
 let openfilters = false;
 
-document.getElementById("filtersbutton").addEventListener("click", () => {
+function openfiltersfunc(){
     if (openfilters) {
         document.querySelector(".filters").style.display = "none";
         openfilters = false;
@@ -376,7 +388,17 @@ document.getElementById("filtersbutton").addEventListener("click", () => {
         document.querySelector(".filters").style.display = "block";
         openfilters = true;
     }
+};
+
+document.getElementById("filtersbutton").addEventListener("click", () => {
+    openfiltersfunc();
 });
+
+document.getElementById("activity").onscroll = () => {
+    if (openfilters) {
+        openfiltersfunc();
+    }
+};
 setInterval(() => {
     if (OrdersCharged) {
         updatevalues();
