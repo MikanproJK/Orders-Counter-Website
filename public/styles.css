@@ -71,6 +71,7 @@ main {
     height: 100%;
     display: flex;
     flex-direction: column;
+    justify-content: center;
 }
 .pestains {
     width: 100%;
@@ -274,12 +275,13 @@ a {
     margin-top: 1%;
     margin-bottom: 1%;
 }
-
 footer {
-    margin-left: 10%;
+    display: flex;
+    justify-content: center;
 }
 footer span {
     color: rgb(177, 177, 177);
+    font-size: 80%;
 }
 
 /* Media Queries para dispositivos móviles */
