@@ -43,8 +43,8 @@ fetch("html/week.html")
 class Order {
     constructor(cantity) {
         this.cantity = cantity;
-        this.id = ORDERS.length > 0 ? ORDERS[ORDERS.length - 1].id + 1 : 0;
         this.date = new Date();
+        this.id = ORDERS.length + this.date.getMilliseconds()+this.date.getSeconds()+this.date.getMinutes()+this.date.getHours()+Math.floor(Math.random() * 1000);
 
         this.frame = document.createElement("div");
         this.frame.className = "order";
@@ -77,8 +77,6 @@ class Order {
             .then(() => {
                 this.frame.remove();
                 ORDERS.splice(this.id, 1);
-                document.removeChild(this.frame.closest('.weekpestain'))
-                document.removeChild(this.frame.closest('.daypestain'))
             })
             .catch(error => console.error('Error al eliminar la orden:', error));
         }
@@ -130,6 +128,7 @@ function NewWeek(date) {
     const formattedWeekEnd = weekEnd.toISOString().split("T")[0];
 
     const id = formattedWeekStart + "-" + formattedWeekEnd
+    console.log(id);
 
     // Crear objeto semana
     const week = { weekStart: formattedWeekStart, weekEnd: formattedWeekEnd, payed: false, id: id};
@@ -185,6 +184,7 @@ function checkDayIsInWeek(day) {
 
         // Verificar si el día está dentro del rango de la semana
         if (checkDate >= weekStart && checkDate <= weekEnd) {
+            console.log(`El día ${day} está en la semana ${week.id}`);
             return [true, week]; // Devuelve true y la semana encontrada
         }
     }

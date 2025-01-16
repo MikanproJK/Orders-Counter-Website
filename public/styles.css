@@ -105,6 +105,7 @@ h1 {
 }
 .resume {
     width: 20%;
+    height: 95%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -157,6 +158,7 @@ button:hover {
 }
 button {
     background-color: #ffffff;
+
 }
 .resumeinfo {
     display: flex;
@@ -166,7 +168,6 @@ button {
 .ordersmethod {
     display: flex;
     flex-direction: column;
-    margin-bottom: 10%;
 }
 .ordersmethod button {
     margin-right: 5%;
@@ -235,4 +236,18 @@ a {
 }
 #weekpayedtext {
     margin-left: 2%;
+}
+#addorder {
+    padding-top: 3%;
+    padding-bottom: 3%;
+    border: none;
+    border-radius: var(--borderradius);
+    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.349);
+
+    transition: ease 0.3s;
+}
+#addorder:hover {
+    background-color: #ffffff;
+    box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.349);
+    cursor: pointer;
 }
