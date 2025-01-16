@@ -41,7 +41,7 @@ fetch("html/week.html")
 
 // Clase Order
 class Order {
-    constructor(cantity) {
+    constructor(cantity, renderize) {
         this.cantity = cantity;
         this.date = new Date();
         this.id = ORDERS.length + this.date.getMilliseconds()+this.date.getSeconds()+this.date.getMinutes()+this.date.getHours()+Math.floor(Math.random() * 1000);
@@ -49,7 +49,7 @@ class Order {
         this.frame = document.createElement("div");
         this.frame.className = "order";
         this.frame.innerHTML = OrderHTML;
-        this.init();
+        if (!renderize===false) {this.init()}
     }
 
     init() {
@@ -132,6 +132,7 @@ function NewWeek(date) {
 
     // Crear objeto semana
     const week = { weekStart: formattedWeekStart, weekEnd: formattedWeekEnd, payed: false, id: id};
+    console.log(week)
 
     // Crear y añadir un elemento DOM para la semana
     const frame = document.createElement("div");
@@ -193,17 +194,62 @@ function checkDayIsInWeek(day) {
 
 
 // Cargar órdenes del servidor
-function loadOrders() {
+function loadOrders(date,orders,week) {
+    console.log(date,orders,week)
     fetch('/orders')
         .then(response => response.json())
         .then(data => {
             if (data) {
                 ORDERS = data.orders;
                 ORDERS.forEach(orderData => {
-                    const order = new Order(orderData.cantity);
-                    order.id = orderData.id;
-                    order.date = new Date(orderData.date);
-                    order.init();
+                    if (!date && !orders && !week) {
+                        const newOrder = new Order(orderData.cantity);
+                        newOrder.id = orderData.id;
+                        newOrder.date = new Date(orderData.date);
+                        newOrder.payed = orderData.payed;
+                        newOrder.init();
+                        console.log("No se proporcionaron filtros")
+                        return
+                    }else{
+                        if (date){
+                            console.log("verificando date")
+                            if (new Date(orderData.date).toISOString().split('T')[0] === date){
+                                const newOrder = new Order(orderData.cantity);
+                                newOrder.id = orderData.id;
+                                newOrder.date = new Date(orderData.date);
+                                newOrder.payed = orderData.payed;
+                                newOrder.init();
+                                console.log("Added order with date: " + date);
+                            }
+                        }
+                        if (orders){
+                            console.log("verificando orders")
+                            if (orderData.cantity === orders){
+                                const newOrder = new Order(orderData.cantity);
+                                newOrder.id = orderData.id;
+                                newOrder.date = new Date(orderData.date);
+                                newOrder.payed = orderData.payed;
+                                newOrder.init();
+                            }
+                        }
+                        if (week){
+                            console.log("verificando weeks")
+                            console.log(week)
+                            const newOrder = new Order(orderData.cantity);
+                            newOrder.id = orderData.id;
+                            newOrder.date = new Date(orderData.date);
+                            newOrder.payed = orderData.payed;
+                            newOrder.init();
+                            const checkday = checkDayIsInWeek(newOrder.date.getDate());
+                            if (checkday[0] && checkday[1].weekStart === week){
+                            }else{
+                                newOrder.frame.closest(".weekpestain").remove();
+                                newOrder.frame.closest(".daypestain").remove();
+                                newOrder.frame.remove();
+                                ORDERS.splice(newOrder.id, 1);
+                            }
+                        }
+                    }
                 });
                 errormessages = data.errormessages;
                 errormessages.forEach(errorMessage => {
@@ -228,8 +274,49 @@ function removeallorders(){
 }
 document.getElementById("searchb").addEventListener("click", () => {
     removeallorders();
-    loadOrders();
+    const dateInput = document.getElementById("datefilter").value;
+    let datefilter;
+
+    if (dateInput) {
+        datefilter = new Date(dateInput).toISOString().split('T')[0];
+    } else {
+        datefilter = null; // O puedes asignar un valor por defecto si lo deseas
+    }
+
+    const ordersfilter = parseInt(document.getElementById("ordersfilter").value, 10);
+    const weekfilter = document.getElementById("weekfilter").value;
+
+    let weekStart = null;
+    let weekEnd = null;
+
+    // Si hay un filtro de semana, calcular el inicio y fin de la semana
+    if (weekfilter) {
+        const { start, end } = getStartAndEndOfWeek(weekfilter);
+        if (start){weekStart = start.toISOString().split('T')[0];}
+        if (end){weekEnd = end.toISOString().split('T')[0];}
+    }
+    loadOrders(datefilter, ordersfilter, weekStart);
 });
+
+// Función para obtener el inicio y fin de la semana
+function getStartAndEndOfWeek(weekValue) {
+    const [year, week] = weekValue.split('-W').map(Number);
+    const firstDayOfYear = new Date(year, 0, 1);
+    const daysOffset = (week - 1) * 7;
+    const startOfWeek = new Date(firstDayOfYear.setDate(firstDayOfYear.getDate() + daysOffset));
+    
+    const dayOfWeek = startOfWeek.getDay();
+    const mondayOffset = (dayOfWeek === 0) ? -6 : 1 - dayOfWeek;
+    startOfWeek.setDate(startOfWeek.getDate() + mondayOffset);
+    
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+    return {
+        start: startOfWeek,
+        end: endOfWeek,
+    };
+}
 
 
 // Agregar una nueva orden
