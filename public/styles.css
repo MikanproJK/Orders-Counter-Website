@@ -251,3 +251,55 @@ a {
     box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.349);
     cursor: pointer;
 }
+
+/* Media Queries para dispositivos móviles */
+@media (max-width: 768px) {
+    header {
+        height: 10%; /* Aumentar el tamaño del header en móviles */
+    }
+
+    .mainframe {
+        flex-direction: column; /* Cambiar a columna para mejor visualización */
+    }
+
+    .barcontent {
+        width: 100%; /* Ocupar el ancho completo en móviles */
+        height: auto; /* Ajustar la altura automáticamente */
+    }
+
+    .content {
+        margin: 1%;
+        width: calc(100% - 2%); /* Ajustar el ancho con márgenes */
+        height: auto; /* Ajustar la altura automáticamente */
+    }
+
+    .sectors {
+        flex-direction: column; /* Cambiar a columna para mejor visualización */
+    }
+
+    .pestaincontainer {
+        margin-top: 5%; /* Ajustar el margen superior */
+    }
+
+    .pestain {
+        padding-left: 2%; /* Reducir el padding para móviles */
+    }
+
+    .weekpestain, .daypestain {
+        margin: 1%; /* Ajustar márgenes para mejor visualización */
+    }
+
+    .currentorderstitle {
+        margin-left: 5%; /* Ajustar el margen izquierdo */
+    }
+
+    .resume {
+        width: 100%; /* Ocupar el ancho completo */
+        height: auto; /* Ajustar la altura automáticamente */
+    }
+
+    .activity {
+        width: 100%; /* Ocupar el ancho completo */
+        height: auto; /* Ajustar la altura automáticamente */
+    }
+}
