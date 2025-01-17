@@ -59,6 +59,7 @@ class Order {
         this.frame.querySelector("#orderday").textContent = `Día: ${this.date.toLocaleDateString()}`;
         this.frame.querySelector('#orderhour').textContent = `Hora: ${this.date.toLocaleTimeString()}`;
         this.frame.querySelector('.delete').addEventListener('click', () => this.delete());
+        this.frame.id = this.id;
 
         const datedaytosearch = this.date.getDate() + "-" + (this.date.getMonth() + 1) + "-" + this.date.getFullYear();
 
@@ -93,10 +94,8 @@ function newday(day, month, year) {
     let week = weekData[1];
 
     if (!week) {
-        console.log(`El día no está en una semana existente: ${date.getDate()}, ${week}`);
         const newWeek = NewWeek(date);
         week = newWeek[1]; // Asignar la nueva semana
-        console.log(`Nueva semana creada: ${week.id}`);
     }
 
     // Crear un nuevo elemento HTML para el día
@@ -128,11 +127,9 @@ function NewWeek(date) {
     const formattedWeekEnd = weekEnd.toISOString().split("T")[0];
 
     const id = formattedWeekStart + "-" + formattedWeekEnd
-    console.log(id);
 
     // Crear objeto semana
     const week = { weekStart: formattedWeekStart, weekEnd: formattedWeekEnd, payed: false, id: id};
-    console.log(week)
 
     // Crear y añadir un elemento DOM para la semana
     const frame = document.createElement("div");
@@ -148,13 +145,10 @@ function NewWeek(date) {
     return [true, week];
 }
 
-function editorder(id,date,quantity,payed){
+function editorder(orderid,newid,date,quantity,payed){
     // Buscar el día en el array
-    const orderIndex = ORDERS.findIndex(order => order.id === id);
-
-    // Actualizar la información del día
-
-    //si existe el cambio lo actualiza
+    const ordernumber = parseInt(orderid, 10);
+    const orderIndex = ORDERS.findIndex(order => order.id === ordernumber);
     if (orderIndex !== -1) {
         if (date) {
             ORDERS[orderIndex].date = date;
@@ -165,13 +159,24 @@ function editorder(id,date,quantity,payed){
         if (payed) {
             ORDERS[orderIndex].payed = payed;
         }
-        fetch(`/orders/${id}`, {
+        if (newid) {
+            ORDERS[orderIndex].id = newid;
+        }
+        fetch(`/orders/${orderid}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(ORDERS[orderIndex])
         })
-    console.error("No se encontró la orden con el ID proporcionado.");
+        .then(response => {
+            if (response.ok) {
+                reloadcontent();
+            }
+        })
     }
+}
+function reloadcontent(){
+    removeallorders();
+    loadOrders();
 }
 
 function checkDayIsInWeek(day) {
@@ -195,7 +200,6 @@ function checkDayIsInWeek(day) {
 
 // Cargar órdenes del servidor
 function loadOrders(date,orders,week) {
-    console.log(date,orders,week)
     fetch('/orders')
         .then(response => response.json())
         .then(data => {
@@ -208,22 +212,18 @@ function loadOrders(date,orders,week) {
                         newOrder.date = new Date(orderData.date);
                         newOrder.payed = orderData.payed;
                         newOrder.init();
-                        console.log("No se proporcionaron filtros")
                         return
                     }else{
                         if (date){
-                            console.log("verificando date")
                             if (new Date(orderData.date).toISOString().split('T')[0] === date){
                                 const newOrder = new Order(orderData.cantity);
                                 newOrder.id = orderData.id;
                                 newOrder.date = new Date(orderData.date);
                                 newOrder.payed = orderData.payed;
                                 newOrder.init();
-                                console.log("Added order with date: " + date);
                             }
                         }
                         if (orders){
-                            console.log("verificando orders")
                             if (orderData.cantity === orders){
                                 const newOrder = new Order(orderData.cantity);
                                 newOrder.id = orderData.id;
@@ -233,8 +233,6 @@ function loadOrders(date,orders,week) {
                             }
                         }
                         if (week){
-                            console.log("verificando weeks")
-                            console.log(week)
                             const newOrder = new Order(orderData.cantity);
                             newOrder.id = orderData.id;
                             newOrder.date = new Date(orderData.date);
@@ -257,8 +255,6 @@ function loadOrders(date,orders,week) {
                 })
                 updatevalues();
                 OrdersCharged = true
-            } else {
-                console.error('Los datos recibidos no contienen un array en "orders".');
             }
         })
         .catch(error => console.error('Error al cargar las órdenes:', error));
@@ -379,88 +375,6 @@ function updatevalues() {
     });
 }
 
-
-document.addEventListener("DOMContentLoaded", () => {
-    updatevalues();
-
-    // Agregar un evento de clic al botón de pagar una semana
-    document.body.addEventListener("input", (event) => {
-        if (event.target.classList.contains("payedButton")) {
-            const weekElement = event.target.closest(".weekpestain");
-            const weekId = weekElement.id;
-
-            const checkbox = event.target;
-
-            const week = weekArray.find(week => week.id === weekId);
-            if (!week) return;
-
-            week.payed = true;
-
-            let weekOrders = [];
-
-            ORDERS.forEach(orderData => {
-                let checkfactor = checkDayIsInWeek(new Date(orderData.date).getDate());
-                if (checkfactor[0] && checkfactor[1].id === weekId) {
-                    weekOrders.push(orderData);
-                }
-            });
-
-            // Actualizar cada orden de la semana
-            weekOrders.forEach(orderData => {
-                if (checkbox.checked) {
-                    orderData.payed = true;
-                } else {
-                    orderData.payed = false;
-                }
-
-                // Llamar al endpoint para actualizar la orden
-                fetch(`/orders/${orderData.id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(orderData)
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Error al actualizar la orden: ' + response.statusText);
-                        }
-                        return response.json();
-                    })
-                    .catch(error => {
-                        console.error('Error al actualizar la orden:', error);
-                    });
-            });
-        }
-    });
-    document.addEventListener("click", () => {
-        const toggleElements = document.getElementsByClassName("toggleview");
-    
-        for (let i = 0; i < toggleElements.length; i++) {
-            const element = toggleElements[i];
-            element.hiddenState = true; // Inicializa el estado del elemento
-    
-            element.addEventListener("click", () => {
-                const contentframe = element.closest(".pestaincontainerframe").querySelector(".contentframe");
-                const children = contentframe.children; // Obtén los hijos de dayActivity
-                if (!element.hiddenState) {
-                    element.textContent = "Mostrar";
-                    for (let j = 0; j < children.length; j++) {
-                        children[j].style.display = "none"; // Oculta cada hijo
-                    }
-                    element.hiddenState = true;
-                } else {
-                    element.textContent = "Ocultar";
-                    for (let j = 0; j < children.length; j++) {
-                        children[j].style.display = "flex"; // Muestra cada hijo
-                    }
-                    element.hiddenState = false;
-                }
-            });
-        }
-    });
-    
-    
-});
-
 function updateweeks(){
     if (weekArray){
         weekArray.forEach(week => {
@@ -474,7 +388,6 @@ function updateweeks(){
                     weekOrders.push(orderData);
                 }
             });
-
             weekOrders.forEach(orderData => {
                 if (!orderData.payed) {
                     allpayed = false;
@@ -505,6 +418,153 @@ function openfiltersfunc(){
     }
 };
 
+function OnAllcharged(){
+        updatevalues();
+    
+    // Agregar un evento de clic al botón de pagar una semana
+    document.body.addEventListener("click", (event) => {
+        if (event.target.classList.contains("payedButton")) {
+            const weekElement = event.target.closest(".weekpestain");
+            const weekId = weekElement.id;
+    
+            const checkbox = event.target;
+    
+            const week = weekArray.find(week => week.id === weekId);
+            if (!week) return;
+    
+            week.payed = true;
+    
+            let weekOrders = [];
+    
+            ORDERS.forEach(orderData => {
+                let checkfactor = checkDayIsInWeek(new Date(orderData.date).getDate());
+                if (checkfactor[0] && checkfactor[1].id === weekId) {
+                    weekOrders.push(orderData);
+                }
+            });
+    
+            // Actualizar cada orden de la semana
+            weekOrders.forEach(orderData => {
+                if (checkbox.checked) {
+                    orderData.payed = true;
+                } else {
+                    orderData.payed = false;
+                }
+    
+                // Llamar al endpoint para actualizar la orden
+                fetch(`/orders/${orderData.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderData)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error al actualizar la orden: ' + response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .catch(error => {
+                        console.error('Error al actualizar la orden:', error);
+                    });
+            });
+        }
+    });
+
+    const toggleElements = document.getElementsByClassName("toggleview");
+
+    for (let i = 0; i < toggleElements.length; i++) {
+        const element = toggleElements[i];
+        element.hiddenState = true; // Inicializa el estado del elemento
+
+        element.addEventListener("click", () => {
+            const contentframe = element.closest(".pestaincontainerframe").querySelector(".contentframe");
+            const children = contentframe.children; // Obtén los hijos de dayActivity
+            if (!element.hiddenState) {
+                element.textContent = "Mostrar";
+                for (let j = 0; j < children.length; j++) {
+                    children[j].style.display = "none"; // Oculta cada hijo
+                }
+                element.hiddenState = true;
+            } else {
+                element.textContent = "Ocultar";
+                for (let j = 0; j < children.length; j++) {
+                    children[j].style.display = "flex"; // Muestra cada hijo
+                }
+                element.hiddenState = false;
+            }
+        });
+    }
+
+    let methods = document.getElementsByClassName("methods");
+    let Editbtns = [];
+    for (let i = 0; i < methods.length; i++) {
+        const elementparent = methods[i];
+        const editbutton = elementparent.querySelector("#edit");
+        if (editbutton) {
+            Editbtns.push(editbutton);
+            let condition = false;
+            editbutton.addEventListener("click", () => {
+                const infodiv = elementparent.closest(".order").querySelector(".info");
+                let editinputs = infodiv.querySelector(".editinputs");
+                if (condition) {
+                    editinputs.style.display = "none";
+                    condition = false;
+                } else {
+                    editinputs.style.display = "flex";
+                    condition = true;
+                }
+            });
+        }
+    }
+    const cancelinputs = document.getElementsByClassName("editcancelinput")
+    for (let i = 0; i < cancelinputs.length; i++) {
+        cancelinputs[i].addEventListener("click", () => {
+            const infodiv = cancelinputs[i].closest(".order").querySelector(".info");
+            let editinputs = infodiv.querySelector(".editinputs");
+            editinputs.style.display = "none";
+        });
+    }
+    const saveinputs = document.getElementsByClassName("editsaveinput");
+    for (let i = 0; i < saveinputs.length; i++) {
+        saveinputs[i].addEventListener("click", () => {
+            const finaldesition = confirm("¿Deseas guardar los cambios?");
+            if (finaldesition) {
+                const maindiv = saveinputs[i].closest(".editinputs");
+                if (maindiv) {
+                    const dayinput = maindiv.querySelector("#editdayinput").value || ''; // Fecha en formato "YYYY-MM-DD"
+                    const timeinput = maindiv.querySelector("#edittimeinput").value || ''; // Hora en formato "HH:MM"
+                    const idinput = maindiv.querySelector("#editidinput").value || '';
+                    const quantityinput = maindiv.querySelector("#editorderinput").value || '';
+    
+                    const mainorder = saveinputs[i].closest(".order");
+    
+                    // Verificar qué campos se tendrán que actualizar
+                    const newid = parseInt(idinput, 10);
+                    const newquantity = parseInt(quantityinput, 10);
+    
+                    // Crear un objeto Date a partir de los inputs
+                    const [year, month, day] = dayinput.split('-'); // "YYYY-MM-DD"
+                    const [hours, minutes] = timeinput.split(':'); // "HH:MM"
+    
+                    // Crear el objeto Date (restar 1 al mes porque es 0-indexado)
+                    const newDate = new Date(year, month - 1, day, hours, minutes);
+    
+                    // Convertir a formato ISO
+                    const isoString = newDate.toISOString();
+    
+                    // Aquí puedes usar isoString en tu lógica
+                    console.log(mainorder.id, newid, isoString, newquantity);
+                    
+                    // Si tienes una función para editar la orden, puedes llamarla aquí
+                    editorder(mainorder.id, newid, isoString, newquantity);
+                } else {
+                    console.error("No se encontró el contenedor principal .editinputs");
+                }
+            }
+        });
+    }
+}
+
 document.getElementById("filtersbutton").addEventListener("click", () => {
     openfiltersfunc();
 });
@@ -515,9 +575,15 @@ document.getElementById("activity").onscroll = () => {
     }
 };
 
+let allcharged = false;
+
 setInterval(() => {
     if (OrdersCharged) {
         updatevalues();
         updateweeks();
+        if(!allcharged){
+            allcharged = true;
+            OnAllcharged();
+        }
     }
 }, 500); // Ejecuta cada 1 segundo

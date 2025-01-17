@@ -123,7 +123,7 @@ h1 {
 .activity {
     width: 80%;
     height: 95%;
-    overflow-y: auto;
+    overflow-y:scroll;
     box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.247);
     border-radius: var(--borderradius);
 }
@@ -161,6 +161,7 @@ h1 {
     padding-top: 1%;
     padding-bottom: 1%;
     padding-left: 1%;
+    display: flex;
 }
 button:hover {
     cursor: pointer;
@@ -286,6 +287,19 @@ footer span {
 .toggleview:hover {
     cursor: pointer;
 
+}
+
+.editinputs {
+    margin-top: 1%;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 1%;
+
+    display: none;
+}
+.finaleditzone {
+    display: flex;
+    justify-content:flex-end;
 }
 
 /* Media Queries para dispositivos móviles */

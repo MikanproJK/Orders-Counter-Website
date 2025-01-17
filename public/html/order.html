@@ -1,14 +1,26 @@
 
 <div class="info">
-    <div class="timedata">
-        <span id="orderday">Día: 00/00/0000</span>
-        <span id="orderhour">Hora: 00:00</span>
-        <span id="orderid">Id: 0</span>
+    <div class="infoOrder">
+        <div class="timedata">
+            <span id="orderday">Día: 00/00/0000</span>
+            <span id="orderhour">Hora: 00:00</span>
+            <span id="orderid">Id: 0</span>
+        </div>
+        <div class="orders">
+            <span id="OrderORDERS">Pedidos: 0</span>
+            <span id="ordergains">Ganancias: 0</span>
+        </div>
     </div>
-    <div class="orders">
-        <span id="OrderORDERS">Pedidos: 0</span>
-        <span id="ordergains">Ganancias: 0</span>
-       </div>
+    <div class="editinputs">
+        <input type="date" name="" id="editdayinput" placeholder="Fecha">
+        <input type="datetime" name="" id="edittimeinput" placeholder="Hora">
+        <input type="number" name="" id="editidinput" placeholder="Id">
+        <input type="number" name="" id="editorderinput" placeholder="Pedidos">
+        <div class="finaleditzone">
+            <input type="button" value="Guardar" class="editsaveinput">
+            <input type="button" value="Cancelar" class="editcancelinput">
+        </div>
+    </div>
 </div>
 <div class="methods">
      <button class="methodbutton delete" id="delete">Eliminar</button>
