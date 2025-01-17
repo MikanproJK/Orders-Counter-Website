@@ -44,7 +44,7 @@ class Order {
     constructor(cantity, renderize) {
         this.cantity = cantity;
         this.date = new Date();
-        this.id = ORDERS.length + this.date.getMilliseconds()+this.date.getSeconds()+this.date.getMinutes()+this.date.getHours()+Math.floor(Math.random() * 1000);
+        this.id = Math.pow(ORDERS.length*40 + this.date.getMilliseconds()*20+this.date.getSeconds()*25+this.date.getMinutes()*30+this.date.getHours()*35+Math.floor(Math.random() * 1000),2);
 
         this.frame = document.createElement("div");
         this.frame.className = "order";
@@ -101,7 +101,7 @@ function newday(day, month, year) {
 
     // Crear un nuevo elemento HTML para el día
     const frame = document.createElement("div");
-    frame.className = "daypestain";
+    frame.className = "daypestain pestaincontainerframe";
     frame.id = id;
     frame.innerHTML = dayhtml;
     frame.querySelector(".info_day").textContent = `Día: ${day}-${month + 1}-${year}`;
@@ -136,7 +136,7 @@ function NewWeek(date) {
 
     // Crear y añadir un elemento DOM para la semana
     const frame = document.createElement("div");
-    frame.className = "weekpestain";
+    frame.className = "weekpestain pestaincontainerframe";
     frame.id = `${id}`;
     frame.innerHTML = weekhtml; // Se asume que `weekhtml` está definido
     frame.querySelector(".info_day").textContent = `Semana: ${formattedWeekStart} - ${formattedWeekEnd}`;
@@ -390,21 +390,21 @@ document.addEventListener("DOMContentLoaded", () => {
             const weekId = weekElement.id;
 
             const checkbox = event.target;
-    
+
             const week = weekArray.find(week => week.id === weekId);
             if (!week) return;
-    
+
             week.payed = true;
-    
+
             let weekOrders = [];
-    
+
             ORDERS.forEach(orderData => {
                 let checkfactor = checkDayIsInWeek(new Date(orderData.date).getDate());
                 if (checkfactor[0] && checkfactor[1].id === weekId) {
                     weekOrders.push(orderData);
                 }
             });
-    
+
             // Actualizar cada orden de la semana
             weekOrders.forEach(orderData => {
                 if (checkbox.checked) {
@@ -412,25 +412,53 @@ document.addEventListener("DOMContentLoaded", () => {
                 } else {
                     orderData.payed = false;
                 }
-    
+
                 // Llamar al endpoint para actualizar la orden
                 fetch(`/orders/${orderData.id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(orderData)
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Error al actualizar la orden: ' + response.statusText);
-                    }
-                    return response.json();
-                })
-                .catch(error => {
-                    console.error('Error al actualizar la orden:', error);
-                });
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error al actualizar la orden: ' + response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .catch(error => {
+                        console.error('Error al actualizar la orden:', error);
+                    });
             });
         }
     });
+    document.addEventListener("click", () => {
+        const toggleElements = document.getElementsByClassName("toggleview");
+    
+        for (let i = 0; i < toggleElements.length; i++) {
+            const element = toggleElements[i];
+            element.hiddenState = true; // Inicializa el estado del elemento
+    
+            element.addEventListener("click", () => {
+                const contentframe = element.closest(".pestaincontainerframe").querySelector(".contentframe");
+                const children = contentframe.children; // Obtén los hijos de dayActivity
+                if (!element.hiddenState) {
+                    element.textContent = "Mostrar";
+                    for (let j = 0; j < children.length; j++) {
+                        children[j].style.display = "none"; // Oculta cada hijo
+                    }
+                    element.hiddenState = true;
+                } else {
+                    element.textContent = "Ocultar";
+                    for (let j = 0; j < children.length; j++) {
+                        children[j].style.display = "flex"; // Muestra cada hijo
+                    }
+                    element.hiddenState = false;
+                }
+            });
+        }
+    });
+    
+    
 });
 
 function updateweeks(){
@@ -486,6 +514,7 @@ document.getElementById("activity").onscroll = () => {
         openfiltersfunc();
     }
 };
+
 setInterval(() => {
     if (OrdersCharged) {
         updatevalues();

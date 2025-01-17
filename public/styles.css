@@ -283,6 +283,10 @@ footer span {
     color: rgb(177, 177, 177);
     font-size: 80%;
 }
+.toggleview:hover {
+    cursor: pointer;
+
+}
 
 /* Media Queries para dispositivos móviles */
 @media (max-width: 768px) {
