@@ -301,6 +301,14 @@ footer span {
     display: flex;
     justify-content:flex-end;
 }
+#refreshbutton {
+    margin-left: .2%;
+    margin-top: .5%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 /* Media Queries para dispositivos móviles */
 @media (max-width: 768px) {

@@ -145,38 +145,74 @@ function NewWeek(date) {
     return [true, week];
 }
 
-function editorder(orderid,newid,date,quantity,payed){
+function editorder(orderid, newid, datevars, quantity, payed) {
     // Buscar el día en el array
     const ordernumber = parseInt(orderid, 10);
     const orderIndex = ORDERS.findIndex(order => order.id === ordernumber);
-    if (orderIndex !== -1) {
-        if (date) {
-            ORDERS[orderIndex].date = date;
-        }
-        if (quantity) {
-            ORDERS[orderIndex].cantity = quantity;
-        }
-        if (payed) {
-            ORDERS[orderIndex].payed = payed;
-        }
-        if (newid) {
-            ORDERS[orderIndex].id = newid;
-        }
-        fetch(`/orders/${orderid}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(ORDERS[orderIndex])
-        })
-        .then(response => {
-            if (response.ok) {
-                reloadcontent();
-            }
-        })
+
+    if (orderIndex === -1) {
+        console.error("Orden no encontrada");
+        return;
     }
+    console.log(datevars, quantity, payed, newid);
+
+    // Obtener la fecha y hora actual
+    const currentDate = new Date(ORDERS[orderIndex].date);
+
+    // Inicializar variables para año, mes, día, horas y minutos
+    let year, month, day, hours, minutes;
+
+    // Si se proporciona date, usarlo para extraer los valores
+    year = datevars[0] || currentDate.getFullYear();
+  //  month = datevars[1] || currentDate.getMonth();
+    month = (datevars[1] !== undefined ? datevars[1] - 1 : currentDate.getMonth()); // Restar 1 para el mes
+    day = datevars[2] || currentDate.getDate();
+    hours = datevars[3] || currentDate.getHours();
+    minutes = datevars[4] || currentDate.getMinutes();
+
+    // Si alguno de los campos está vacío, usar los valores actuales
+    if (newid === null || newid === undefined || isNaN(newid)) {
+        newid = ORDERS[orderIndex].id; // Mantener el ID actual si no se proporciona uno nuevo
+    }
+    if (quantity === null || quantity === undefined || isNaN(quantity)) {
+        quantity = ORDERS[orderIndex].quantity; // Mantener la cantidad actual si no se proporciona una nueva
+    }
+    if (payed === null || payed === undefined) {
+        payed = ORDERS[orderIndex].payed; // Mantener el estado de pago actual si no se proporciona uno nuevo
+    }
+    console.log(year, month, day, hours, minutes, quantity, payed, newid, currentDate, orderIndex);
+    // Crear un nuevo objeto Date con los valores finales
+    const updatedDate = new Date(year, month, day, hours, minutes);
+    const isoString = updatedDate.toISOString(); // Convertir a formato ISO
+
+    // Actualizar la orden
+    ORDERS[orderIndex].date = isoString; // Actualizar la fecha
+    ORDERS[orderIndex].cantity = quantity; // Actualizar la cantidad
+    ORDERS[orderIndex].payed = payed; // Actualizar el estado de pago
+    ORDERS[orderIndex].id = newid; // Actualizar el ID
+
+    // Enviar la actualización al servidor
+    fetch(`/orders/${orderid}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(ORDERS[orderIndex])
+    })
+    .then(response => {
+        if (response.ok) {
+            reloadcontent(); 
+            console.log("saved");// Recargar el contenido si la respuesta es exitosa
+        } else {
+            console.error('Error al actualizar la orden:', response.statusText);
+        }
+    })
+    .catch(error => {
+        console.error('Error en la solicitud:', error);
+    });
 }
 function reloadcontent(){
     removeallorders();
     loadOrders();
+    allcharged = false;
 }
 
 function checkDayIsInWeek(day) {
@@ -312,7 +348,7 @@ function getStartAndEndOfWeek(weekValue) {
         start: startOfWeek,
         end: endOfWeek,
     };
-}
+};
 
 
 // Agregar una nueva orden
@@ -529,34 +565,46 @@ function OnAllcharged(){
         saveinputs[i].addEventListener("click", () => {
             const finaldesition = confirm("¿Deseas guardar los cambios?");
             if (finaldesition) {
-                const maindiv = saveinputs[i].closest(".editinputs");
+                const maindiv = saveinputs[i].closest(".info");
                 if (maindiv) {
-                    const dayinput = maindiv.querySelector("#editdayinput").value || ''; // Fecha en formato "YYYY-MM-DD"
-                    const timeinput = maindiv.querySelector("#edittimeinput").value || ''; // Hora en formato "HH:MM"
-                    const idinput = maindiv.querySelector("#editidinput").value || '';
-                    const quantityinput = maindiv.querySelector("#editorderinput").value || '';
-    
+                    const dayinput = maindiv.querySelector("#editdayinput").value; // Fecha en formato "YYYY-MM-DD"
+                    const timeinput = maindiv.querySelector("#edittimeinput").value || null; // Hora en formato "HH:MM"
+                    const idinput = maindiv.querySelector("#editidinput").value || null;
+                    const quantityinput = maindiv.querySelector("#editorderinput").value || null;
+                    const payedinput = maindiv.querySelector("#editorpayedinput").checked || null;
+
                     const mainorder = saveinputs[i].closest(".order");
-    
+
                     // Verificar qué campos se tendrán que actualizar
                     const newid = parseInt(idinput, 10);
                     const newquantity = parseInt(quantityinput, 10);
-    
+
                     // Crear un objeto Date a partir de los inputs
-                    const [year, month, day] = dayinput.split('-'); // "YYYY-MM-DD"
-                    const [hours, minutes] = timeinput.split(':'); // "HH:MM"
-    
-                    // Crear el objeto Date (restar 1 al mes porque es 0-indexado)
-                    const newDate = new Date(year, month - 1, day, hours, minutes);
-    
+                    let year, month, day, hours, minutes;
+
+                    if (timeinput) {
+                        [hours, minutes] = timeinput.split(':'); // "HH:MM"
+                    }
+
+                    if (dayinput) {
+                        [year, month, day] = dayinput.split('-'); // "YYYY-MM-DD"
+                    }
+
+                    // Convertir a números
+                    year = parseInt(year, 10)|| null;
+                    month = parseInt(month, 10) || null; // Restar 1 porque los meses son 0-indexados
+                    day = parseInt(day, 10) || null;
+                    hours = parseInt(hours, 10) || null;
+                    minutes = parseInt(minutes, 10) || null;
+
+                    // Crear el objeto Date
+                    const datevars = [year, month, day, hours, minutes];
+
                     // Convertir a formato ISO
-                    const isoString = newDate.toISOString();
-    
-                    // Aquí puedes usar isoString en tu lógica
-                    console.log(mainorder.id, newid, isoString, newquantity);
-                    
+                    //const isoString = newDate.toISOString();
+
                     // Si tienes una función para editar la orden, puedes llamarla aquí
-                    editorder(mainorder.id, newid, isoString, newquantity);
+                    editorder(mainorder.id, newid, datevars, newquantity, payedinput);
                 } else {
                     console.error("No se encontró el contenedor principal .editinputs");
                 }
@@ -574,7 +622,9 @@ document.getElementById("activity").onscroll = () => {
         openfiltersfunc();
     }
 };
-
+document.getElementById("refresh").addEventListener("click", () => {
+    reloadcontent();
+});
 let allcharged = false;
 
 setInterval(() => {
@@ -584,6 +634,6 @@ setInterval(() => {
         if(!allcharged){
             allcharged = true;
             OnAllcharged();
-        }
-    }
+        };
+    };
 }, 500); // Ejecuta cada 1 segundo
