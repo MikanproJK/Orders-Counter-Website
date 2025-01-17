@@ -64,7 +64,6 @@ class Order {
         const datedaytosearch = this.date.getDate() + "-" + (this.date.getMonth() + 1) + "-" + this.date.getFullYear();
 
         if (!DaysArray.includes(datedaytosearch)) { // si no existe un dia con la fecha de order crea uno nuevo
-          DaysArray.push(datedaytosearch);
           newday(this.date.getDate(), this.date.getMonth(), this.date.getFullYear());
         }
         
@@ -154,13 +153,11 @@ function editorder(orderid, newid, datevars, quantity, payed) {
         console.error("Orden no encontrada");
         return;
     }
-    console.log(datevars, quantity, payed, newid);
 
     // Obtener la fecha y hora actual
     const currentDate = new Date(ORDERS[orderIndex].date);
 
     const currentmonth = currentDate.getMonth() + 0;
-    console.log(currentmonth, ORDERS[orderIndex].date, datevars[1]);
     let newmonth
     if (datevars[1] === null || datevars[1] === undefined || isNaN(datevars[1])) {
         newmonth = currentmonth;
@@ -177,7 +174,6 @@ function editorder(orderid, newid, datevars, quantity, payed) {
     day = datevars[2] || currentDate.getDate();
     hours = datevars[3] || currentDate.getHours();
     minutes = datevars[4] || currentDate.getMinutes();
-    console.log(currentmonth)
 
     // Si alguno de los campos está vacío, usar los valores actuales
     if (newid === null || newid === undefined || isNaN(newid)) {
@@ -189,7 +185,6 @@ function editorder(orderid, newid, datevars, quantity, payed) {
     if (payed === null || payed === undefined) {
         payed = ORDERS[orderIndex].payed; // Mantener el estado de pago actual si no se proporciona uno nuevo
     }
-    console.log(year, month, day, hours, minutes, quantity, payed, newid, currentDate, orderIndex);
     // Crear un nuevo objeto Date con los valores finales
     const updatedDate = new Date(year, month, day, hours, minutes);
     const isoString = updatedDate.toISOString(); // Convertir a formato ISO
@@ -399,6 +394,8 @@ function updatevalues() {
     let ultimgains = ordersnotpayed * 500;
     document.getElementById("totalorders").textContent = `Total de Pedidos: ${orders}`;
     document.getElementById("totalgains").textContent = `Total de Ganancias: ${totalgains}`;
+    document.getElementById("totalweeks").textContent = `Total de Semanas: ${weekArray.length}`;
+    document.getElementById("totaldays").textContent = `Total de Días: ${DaysArray.length}`;
     document.getElementById("ultimorders").textContent = `Pedidos: ${ordersnotpayed}`;
     document.getElementById("ultimgains").textContent = `Ganancias: ${ultimgains}`;
     document.getElementById("chargeamount").textContent = `Monto de cargos: ${ultimgains}`
