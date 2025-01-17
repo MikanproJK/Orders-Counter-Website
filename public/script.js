@@ -159,16 +159,25 @@ function editorder(orderid, newid, datevars, quantity, payed) {
     // Obtener la fecha y hora actual
     const currentDate = new Date(ORDERS[orderIndex].date);
 
+    const currentmonth = currentDate.getMonth() + 0;
+    console.log(currentmonth, ORDERS[orderIndex].date, datevars[1]);
+    let newmonth
+    if (datevars[1] === null || datevars[1] === undefined || isNaN(datevars[1])) {
+        newmonth = currentmonth;
+    }else {
+        newmonth = datevars[1] - 1;
+    }
+
     // Inicializar variables para año, mes, día, horas y minutos
     let year, month, day, hours, minutes;
 
     // Si se proporciona date, usarlo para extraer los valores
     year = datevars[0] || currentDate.getFullYear();
-  //  month = datevars[1] || currentDate.getMonth();
-    month = (datevars[1] !== undefined ? datevars[1] - 1 : currentDate.getMonth()); // Restar 1 para el mes
+    month = newmonth;
     day = datevars[2] || currentDate.getDate();
     hours = datevars[3] || currentDate.getHours();
     minutes = datevars[4] || currentDate.getMinutes();
+    console.log(currentmonth)
 
     // Si alguno de los campos está vacío, usar los valores actuales
     if (newid === null || newid === undefined || isNaN(newid)) {
@@ -319,7 +328,6 @@ document.getElementById("searchb").addEventListener("click", () => {
     const weekfilter = document.getElementById("weekfilter").value;
 
     let weekStart = null;
-    let weekEnd = null;
 
     // Si hay un filtro de semana, calcular el inicio y fin de la semana
     if (weekfilter) {
