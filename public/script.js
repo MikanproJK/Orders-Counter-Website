@@ -16,6 +16,9 @@ let ErrorMessages = [];
 
 date = new Date();
 
+// consts
+const rate = 500;
+
 // Cargar la plantilla de HTML
 fetch('html/order.html')
     .then(response => response.text())
@@ -54,7 +57,7 @@ class Order {
 
     init() {
         this.frame.querySelector("#OrderORDERS").textContent = `Pedidos: ${this.cantity}`;
-        this.frame.querySelector("#ordergains").textContent = `Ganancias: ${this.cantity * 500}`;
+        this.frame.querySelector("#ordergains").textContent = `Ganancias: ${this.cantity * rate}`;
         this.frame.querySelector("#orderid").textContent = `ID: ${this.id}`;
         this.frame.querySelector("#orderday").textContent = `Día: ${this.date.toLocaleDateString()}`;
         this.frame.querySelector('#orderhour').textContent = `Hora: ${this.date.toLocaleTimeString()}`;
